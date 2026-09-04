@@ -61,6 +61,7 @@ body {
   background: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-nunito), sans-serif;
+  line-height: normal;
   -webkit-font-smoothing: antialiased;
 }
 

@@ -5,7 +5,7 @@ type IconProps = SVGProps<SVGSVGElement>;
 
 interface IconTemplateProps extends PropsWithChildren<IconProps> {
   size: number;
-  strokeWidth?: number;
+  strokeWidth?: string | number;
 }
 
 // Plantilla base: atributos comunes de los SVG del mock (trazo, esquinas redondeadas, hereda el color actual)
