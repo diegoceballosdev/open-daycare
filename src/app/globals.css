@@ -36,6 +36,27 @@
   /* Azul del avatar de niño */
   --color-avatar-blue: #a9d9e8;
   --color-avatar-blue-ink: #1f7a93;
+  /* Rosa (avatar de Sofía/Emma, badge VINCULAR) */
+  --color-pink: #f4b8cc;
+  --color-pink-ink: #c44a7a;
+  --color-pink-soft: #f9d2de;
+  --color-pink-deep: #c56486;
+  /* Púrpura (avatar de Tomás) */
+  --color-purple: #c9b6e8;
+  --color-purple-ink: #7b5fc0;
+  --color-purple-soft: #ede6f8;
+  /* Verde (avatar de Benjamín/Olivia, badge ACTIVA) */
+  --color-green: #b9dec4;
+  --color-green-ink: #3e8b62;
+  --color-green-soft: #CFEBD8;
+  /* Amarillo (avatar de Valentina, badge PENDIENTE) */
+  --color-yellow: #f4dc8e;
+  --color-yellow-ink: #9a7b1e;
+  --color-yellow-soft: #f7e7a6;
+  /* Warning (tarjeta de alergias y badge MANÍ/LACTOSA) */
+  --color-warning: #fbdad6;
+  --color-warning-soft: #fbd8cc;
+  --color-warning-ink: #d9684a;
   /* Azul del badge ANUNCIO */
   --color-announcement: #4e72c8;
   --color-announcement-soft: #ccd8f4;

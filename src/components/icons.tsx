@@ -142,3 +142,92 @@ export function ImageIcon(props: IconProps) {
     </IconTemplate>
   );
 }
+
+// Icono de alerta (triángulo de advertencia, tarjeta de alergias)
+export function AlertIcon(props: IconProps) {
+  return (
+    <IconTemplate size={22} {...props}>
+      <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+      <path d="M12 9v4M12 17h.01" />
+    </IconTemplate>
+  );
+}
+
+// Icono de flecha izquierda (enlace "Volver a Niños")
+export function BackIcon(props: IconProps) {
+  return (
+    <IconTemplate size={18} strokeWidth={2.2} {...props}>
+      <path d="m15 18-6-6 6-6" />
+    </IconTemplate>
+  );
+}
+
+// Icono de check (confirmación)
+export function CheckIcon(props: IconProps) {
+  return (
+    <IconTemplate size={16} {...props}>
+      <path d="M20 6 9 17l-5-5" />
+    </IconTemplate>
+  );
+}
+
+// Icono de chevron derecho (flecha de tarjetas con padres vinculados)
+export function ChevronIcon(props: IconProps) {
+  return (
+    <IconTemplate size={18} strokeWidth={2.2} {...props}>
+      <path d="m9 18 6-6-6-6" />
+    </IconTemplate>
+  );
+}
+
+// Icono de usuario con más (vincular padre)
+export function LinkParentIcon(props: IconProps) {
+  return (
+    <IconTemplate size={18} strokeWidth={2.2} {...props}>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M3 20a6 6 0 0 1 12 0" />
+      <path d="M18 12v6M15 15h6" />
+    </IconTemplate>
+  );
+}
+
+// Icono de calendario (fecha de nacimiento / ingreso)
+export function CalendarIcon(props: IconProps) {
+  return (
+    <IconTemplate size={18} {...props}>
+      <rect x="3" y="4" width="18" height="17" rx="2" />
+      <path d="M16 2v4M8 2v4M3 10h18" />
+    </IconTemplate>
+  );
+}
+
+// Icono de sala (habitación)
+export function RoomIcon(props: IconProps) {
+  return (
+    <IconTemplate size={18} {...props}>
+      <path d="M4 22V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16" />
+      <path d="M2 22h20" />
+      <path d="M14 12h.01" />
+    </IconTemplate>
+  );
+}
+
+// Icono de resumen del día (sol, botón "Resumen del día")
+export function SummaryIcon(props: IconProps) {
+  return (
+    <IconTemplate size={18} {...props}>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+    </IconTemplate>
+  );
+}
+
+// Icono de lupa (barra de búsqueda de niños)
+export function SearchIcon(props: IconProps) {
+  return (
+    <IconTemplate size={18} {...props}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m21 21-4.3-4.3" />
+    </IconTemplate>
+  );
+}
