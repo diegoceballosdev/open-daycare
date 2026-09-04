@@ -1,15 +1,20 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import { currentUser } from "@/data/posts";
 import { BellIcon, HomeIcon, LogoutIcon, PlusIcon, SunIcon, UserIcon, UsersIcon } from "@/components/icons";
 
-// Items de navegación del sidebar (todos inertes por ahora)
+// Items de navegación del sidebar (links inertes; el estado activo depende de la ruta actual)
 const navItems = [
-  { label: "Feed", icon: HomeIcon, active: true },
-  { label: "Niños", icon: UsersIcon, active: false },
-  { label: "Avisos", icon: BellIcon, active: false },
-  { label: "Mi cuenta", icon: UserIcon, active: false },
+  { label: "Feed", icon: HomeIcon, isActive: (path: string) => path === "/" },
+  { label: "Niños", icon: UsersIcon, isActive: (path: string) => path.startsWith("/ninos") },
+  { label: "Avisos", icon: BellIcon, isActive: (path: string) => path.startsWith("/avisos") },
+  { label: "Mi cuenta", icon: UserIcon, isActive: (path: string) => path.startsWith("/mi-cuenta") },
 ];
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="sticky top-0 hidden h-screen w-[248px] flex-none flex-col border-r border-line bg-surface px-4 py-6 lg:flex">
       {/* Marca */}
@@ -34,18 +39,21 @@ export default function Sidebar() {
 
       {/* Navegación */}
       <nav className="flex flex-1 flex-col gap-1">
-        {navItems.map(({ label, icon: Icon, active }) => (
-          <a
-            key={label}
-            href="#"
-            className={`flex items-center gap-3 rounded-xl px-3 py-[11px] text-[14.5px] ${
-              active ? "bg-accent-soft font-extrabold text-accent" : "bg-transparent font-semibold text-ink-nav"
-            }`}
-          >
-            <Icon />
-            {label}
-          </a>
-        ))}
+        {navItems.map(({ label, icon: Icon, isActive }) => {
+          const active = isActive(pathname);
+          return (
+            <a
+              key={label}
+              href="#"
+              className={`flex items-center gap-3 rounded-xl px-3 py-[11px] text-[14.5px] ${
+                active ? "bg-accent-soft font-extrabold text-accent" : "bg-transparent font-semibold text-ink-nav"
+              }`}
+            >
+              <Icon />
+              {label}
+            </a>
+          );
+        })}
       </nav>
 
       {/* Bloque de usuario */}
