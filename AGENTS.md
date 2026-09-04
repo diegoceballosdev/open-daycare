@@ -49,3 +49,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - /spec usaremos esta skill para crear las especificaciones
 - /spec-impl usaremos esta skill para implementar las especificaciones
+
+## Reglas de codigo
+
+- Usar codigo limpio.
+- Nombres de variables y funciones en ingles.
+- Comentarios en español.

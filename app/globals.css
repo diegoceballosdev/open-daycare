@@ -1,26 +1,74 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Fondo general de la app */
+  --color-cream: #f6ecdf;
+  /* Superficies (sidebar, tarjetas) */
+  --color-surface: #fffdf9;
+  /* Bordes suaves */
+  --color-line: #ece0d0;
+  /* Texto principal */
+  --color-ink: #3f362e;
+  /* Texto secundario */
+  --color-ink-muted: #94887b;
+  /* Texto tenue */
+  --color-ink-faint: #a89a8b;
+  /* Texto de nav en sidebar */
+  --color-ink-nav: #6e6359;
+  /* Cuerpo de publicaciones */
+  --color-ink-body: #4a4038;
+  /* Acento salmón (etiqueta de cabecera) */
+  --color-accent: #d9583c;
+  /* Salmón fuerte (corazón) */
+  --color-accent-strong: #e0654a;
+  /* Salmón suave (fondo del botón cámara) */
+  --color-accent-soft: #fbe3d8;
+  /* Enlace Editar */
+  --color-accent-edit: #c5503a;
+  /* Naranja de marca (avatar de usuario) */
+  --color-brand: #f2937a;
+  /* Verde del badge LOGRO */
+  --color-success: #3e9b6c;
+  --color-success-soft: #cfe8d8;
+  /* Azul del badge ACTIVIDAD */
+  --color-info: #2e89a6;
+  --color-info-soft: #c7e7f1;
+  /* Azul del avatar de niño */
+  --color-avatar-blue: #a9d9e8;
+  --color-avatar-blue-ink: #1f7a93;
+  /* Azul del badge ANUNCIO */
+  --color-announcement: #4e72c8;
+  --color-announcement-soft: #ccd8f4;
+  /* Separadores dentro de las tarjetas */
+  --color-divider: #f0e6d8;
+  --color-divider-strong: #e7dac8;
+  /* Placeholder de foto */
+  --color-photo-bg: #f4ece1;
+  --color-photo-ink: #b0a290;
+  --color-photo-line: #dbcdba;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Fredoka para títulos */
+  --font-display: var(--font-fredoka);
+  /* Nunito para el cuerpo */
+  --font-sans: var(--font-nunito), sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-nunito), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e4d6c4;
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
 }
