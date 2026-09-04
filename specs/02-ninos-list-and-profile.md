@@ -1,6 +1,6 @@
 # SPEC 02 — Niños: lista y perfil
 
-> **Status:** Approved
+> **Status:** Implemented
 > **Depends on:** SPEC 01
 > **Date:** 2026-09-04
 > **Objective:** Replicar `references/pantallas/ninos.dc.html` (lista de niños) y `references/pantallas/perfil-nino.dc.html` (perfil individual) como rutas `/ninos` y `/ninos/[id]` con datos mock tipados, reutilizando componentes del SPEC 01 y sin autenticación.
@@ -87,19 +87,19 @@ Cada paso deja la app funcional:
 
 ## Acceptance criteria
 
-- [ ] `/ninos` renderiza la lista con los 8 niños del mock, mismos nombres, edades y copy.
-- [ ] Grid de 2 columnas con tarjetas idénticas al mock (avatar, nombre, subtítulo, badge/flecha).
-- [ ] Barra de búsqueda decorativa con placeholder "Buscar niño…".
-- [ ] Cabecera con "GESTIÓN", "Niños" y botón "Agregar niño".
-- [ ] Label "SALA SOLES" con conteo "8 niños".
-- [ ] `/ninos/mateo-fernandez` (o id correspondiente) renderiza el perfil de Mateo Fernández idéntico al mock.
-- [ ] Perfil muestra: nombre, edad/sala, tarjeta de alergias (si existe), info (nacimiento, sala, ingreso), botón "Resumen del día", padres vinculados con badges de estado.
-- [ ] Enlace "Volver a Niños" funcional (`href="/ninos"`).
-- [ ] Nav del sidebar tiene "Niños" activo en ambas rutas.
-- [ ] Todos los botones/enlaces operacionales son inert (`href="#"`), excepto "Volver a Niños".
-- [ ] Datos mock renderizados desde `src/data/children.ts` tipado (no JSX hardcodeado).
-- [ ] A <1024px el sidebar se oculta y el contenido ocupa el ancho completo.
-- [ ] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan.
+- [x] `/ninos` renderiza la lista con los 8 niños del mock, mismos nombres, edades y copy.
+- [x] Grid de 2 columnas con tarjetas idénticas al mock (avatar, nombre, subtítulo, badge/flecha).
+- [x] Barra de búsqueda decorativa con placeholder "Buscar niño…".
+- [x] Cabecera con "GESTIÓN", "Niños" y botón "Agregar niño".
+- [x] Label "SALA SOLES" con conteo "8 niños".
+- [x] `/ninos/mateo-fernandez` (o id correspondiente) renderiza el perfil de Mateo Fernández idéntico al mock.
+- [x] Perfil muestra: nombre, edad/sala, tarjeta de alergias (si existe), info (nacimiento, sala, ingreso), botón "Resumen del día", padres vinculados con badges de estado.
+- [x] Enlace "Volver a Niños" funcional (`href="/ninos"`).
+- [x] Nav del sidebar tiene "Niños" activo en ambas rutas.
+- [x] Todos los botones/enlaces operacionales son inert (`href="#"`), excepto "Volver a Niños".
+- [x] Datos mock renderizados desde `src/data/children.ts` tipado (no JSX hardcodeado).
+- [x] A <1024px el sidebar se oculta y el contenido ocupa el ancho completo.
+- [x] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan.
 
 ## Decisions
 
