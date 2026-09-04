@@ -1,5 +1,6 @@
 import type { Child } from "@/data/children";
 import { ChevronIcon } from "@/components/icons";
+import Link from "next/link";
 
 interface ChildCardProps {
   child: Child;
@@ -14,7 +15,7 @@ function parentsLabel(count: number): string {
 // Tarjeta de niño de la lista: avatar, nombre, subtítulo y badge/flecha derivados de los datos
 export default function ChildCard({ child }: ChildCardProps) {
   return (
-    <a
+    <Link
       href={`/ninos/${child.id}`}
       className="flex min-w-0 items-center gap-3.5 rounded-[18px] border border-line bg-surface p-4 shadow-[0_4px_14px_-12px_rgba(120,90,60,.5)] transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-[#F2A78E]"
     >
@@ -41,6 +42,6 @@ export default function ChildCard({ child }: ChildCardProps) {
       ) : (
         <ChevronIcon className="flex-none text-[#CBB89F]" />
       )}
-    </a>
+    </Link>
   );
 }

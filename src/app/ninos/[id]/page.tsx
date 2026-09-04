@@ -1,6 +1,7 @@
 import Sidebar from "@/components/sidebar";
 import ChildProfile from "@/components/child-profile";
 import { BackIcon } from "@/components/icons";
+import Link from "next/link";
 import { children } from "@/data/children";
 
 export default async function ChildProfilePage(props: PageProps<"/ninos/[id]">) {
@@ -13,10 +14,10 @@ export default async function ChildProfilePage(props: PageProps<"/ninos/[id]">) 
       <main className="h-screen min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[820px] px-10 pb-20 pt-[34px]">
           {/* Volver a Niños */}
-          <a href="/ninos" className="mb-5 flex items-center gap-[7px] text-[14px] font-bold text-ink-muted">
+          <Link href="/ninos" className="mb-5 flex items-center gap-[7px] text-[14px] font-bold text-ink-muted">
             <BackIcon />
             Volver a Niños
-          </a>
+          </Link>
 
           {child ? (
             <ChildProfile child={child} />
