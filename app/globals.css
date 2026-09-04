@@ -42,6 +42,8 @@
   /* Separadores dentro de las tarjetas */
   --color-divider: #f0e6d8;
   --color-divider-strong: #e7dac8;
+  /* Etiqueta de separador (PUBLICADO HOY) */
+  --color-divider-label: #8a7c6d;
   /* Placeholder de foto */
   --color-photo-bg: #f4ece1;
   --color-photo-ink: #b0a290;
