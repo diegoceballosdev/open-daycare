@@ -1,5 +1,5 @@
-import type { Post, PostType } from "@/app/data/posts";
-import { HeartIcon, ImageIcon, MegaphoneIcon, MessageIcon } from "@/app/components/icons";
+import type { Post, PostType } from "@/data/posts";
+import { HeartIcon, ImageIcon, MegaphoneIcon, MessageIcon } from "@/components/icons";
 
 // Tema del badge por tipo de publicación: clave en inglés (PostType), etiqueta visual en español
 const badgeTheme: Record<PostType, { label: string; background: string; dot: string; text: string }> = {

@@ -18,15 +18,16 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Layout
 
-- Next.js 16 App Router at repo-root `app/` (no `src/`). Pages Router is unused.
-- Import alias `@/*` maps to the repo root (`./*`), not `src/`.
+- Next.js 16 App Router under `src/app/` (proyecto con carpeta `src/`). Pages Router is unused.
+- `src/` agrupa el código de la app al mismo nivel: `app/` (solo routing de páginas), `components/`, `data/`, etc.
+- Import alias `@/*` maps to `./src/*`.
 - `CLAUDE.md` only contains `@AGENTS.md` — put guidance here.
 
 ## Next.js / Tailwind quirks
 
-- Request interception is `proxy.ts` at the project root, **not** `middleware.ts`. Export `proxy` (or default).
+- Request interception is `src/proxy.ts`, **not** `middleware.ts`. Export `proxy` (or default).
 - Type routes with global `PageProps<'/path'>` / `LayoutProps<'/path'>` (no import). `params` and `searchParams` are async.
-- Tailwind v4: no `tailwind.config.*`. Tokens live in `app/globals.css` (`@import "tailwindcss"` + `@theme inline`). PostCSS plugin is `@tailwindcss/postcss`.
+- Tailwind v4: no `tailwind.config.*`. Tokens live in `src/app/globals.css` (`@import "tailwindcss"` + `@theme inline`). PostCSS plugin is `@tailwindcss/postcss`.
 - `next-env.d.ts` is generated and gitignored — do not commit or hand-edit it.
 
 ## Product context
@@ -40,6 +41,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Playwright MCP screenshots and related artifacts go in `.playwright-mcp/` (gitignored). Do not write them elsewhere.
 - Use the Context7 MCP for current Next.js / React / Tailwind docs even when you think you know the API.
 
+## Agents
+
+- SPEC-VERIFIER: agent especializado en verificar especificaciones. Uso: `/spec-verify <NN-slug>` (acepta nombre completo, solo número o solo slug). Verifica cada check con evidencia, corrige el código si falla, valida recomendaciones Next.js con Context7, hace verificación visual con Playwright contra `references/pantallas/` y marca los checkboxes en el propio spec. Definido en `.opencode/agent/spec-verifier.md` y `.opencode/command/spec-verify.md`. No hace `git commit` ni `git push`; responde en el idioma del prompt (español por defecto).
+
 ## MCPs
 
 - Playwright Screenshots y cualquier cos relacionada a Playwright tienen que estar en la carpeta .playwritht-mcp
@@ -49,6 +54,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - /spec usaremos esta skill para crear las especificaciones
 - /spec-impl usaremos esta skill para implementar las especificaciones
+- /spec-verify usaremos este comando (agente **spec-verifier**) para verificar los criterios de aceptación de una spec.
 
 ## Reglas de codigo
 

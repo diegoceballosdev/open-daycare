@@ -1,5 +1,5 @@
-import { currentUser } from "@/app/data/posts";
-import { CameraIcon } from "@/app/components/icons";
+import { currentUser } from "@/data/posts";
+import { CameraIcon } from "@/components/icons";
 
 export default function Composer() {
   return (

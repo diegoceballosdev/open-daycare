@@ -1,5 +1,5 @@
-import { currentUser } from "@/app/data/posts";
-import { BellIcon, HomeIcon, LogoutIcon, PlusIcon, SunIcon, UserIcon, UsersIcon } from "@/app/components/icons";
+import { currentUser } from "@/data/posts";
+import { BellIcon, HomeIcon, LogoutIcon, PlusIcon, SunIcon, UserIcon, UsersIcon } from "@/components/icons";
 
 // Items de navegación del sidebar (todos inertes por ahora)
 const navItems = [

@@ -1,7 +1,7 @@
-import Sidebar from "@/app/components/sidebar";
-import Composer from "@/app/components/composer";
-import PostCard from "@/app/components/post-card";
-import { posts } from "@/app/data/posts";
+import Sidebar from "@/components/sidebar";
+import Composer from "@/components/composer";
+import PostCard from "@/components/post-card";
+import { posts } from "@/data/posts";
 
 export default function Home() {
   return (

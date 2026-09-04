@@ -8,14 +8,14 @@
 
 ## Scope — Incluido
 
-- `app/page.tsx` como feed (Home) pixel-idéntico al mock.
+- `src/app/page.tsx` como feed (Home) pixel-idéntico al mock.
 - Sidebar: logo OpenDayCare / Sala Soles, botón "Nueva publicación", nav (Feed activo, Niños, Avisos, Mi cuenta), bloque de usuario "Caro Giménez · Maestra · Soles" y botón cerrar sesión — todo inert (`href="#"`).
 - Cabecera: "GUARDERÍA · SALA SOLES", "Buenas, Caro", "12 niños · martes 17 jun".
 - Composer "Compartí un momento…" (inert).
 - Divider "PUBLICADO HOY" y los 3 posts del mock (logro, actividad con placeholder de foto, anuncio) con textos, badges, contadores (3/1, 5/2, 8/0) y "Editar" exactos.
-- Data mock tipada en `app/data/posts.ts` (render desde datos, no JSX hardcodeado por post).
+- Data mock tipada en `src/data/posts.ts` (render desde datos, no JSX hardcodeado por post).
 - Fuentes Fredoka + Nunito vía `next/font/google` reemplazando Geist.
-- Paleta como tokens en `@theme` de `app/globals.css`.
+- Paleta como tokens en `@theme` de `src/app/globals.css`.
 - Iconos SVG inline replicando los del mock.
 - Responsive mínimo: sidebar se oculta por debajo de `lg` (1024px), contenido a ancho completo.
 
@@ -28,7 +28,7 @@
 
 ## Data model
 
-En `app/data/posts.ts`:
+En `src/data/posts.ts`:
 
 - `type PostType = "achievement" | "activity" | "announcement"` (nombres en inglés; la etiqueta visual queda en español vía map)
 - `interface Author { name: string; initials: string; avatarBackground: string; avatarForeground: string }`
@@ -42,28 +42,28 @@ El tema del badge por tipo (fondo, punto y etiqueta visual LOGRO/ACTIVIDAD/ANUNC
 
 Cada paso deja la app funcional:
 
-1. `app/globals.css`: tokens de paleta en `@theme`, `body` con fondo `#F6ECDF`, color `#3F362E` y font Nunito; quitar el bloque dark/Geist.
-2. `app/layout.tsx`: reemplazar Geist por Fredoka + Nunito con `next/font/google`, `lang="es"`, metadata "OpenDayCare".
-3. `app/data/posts.ts`: tipos + `currentUser` + 3 posts con el contenido exacto del mock.
-4. `app/components/icons.tsx`: SVGs inline (home, users, bell, user, logout, plus, camera, heart, message, megaphone).
-5. `app/components/sidebar.tsx`: marca, botón "Nueva publicación", nav, bloque usuario, logout.
-6. `app/components/post-card.tsx`: avatar, nombre, "publicado por vos", badge por tipo, audiencia, cuerpo, placeholder de foto, likes/comentarios, "Editar".
-7. `app/components/composer.tsx`: tarjeta "Compartí un momento…".
-8. `app/page.tsx`: compone Sidebar + Main (cabecera, composer, divider "PUBLICADO HOY", posts desde `posts`).
+1. `src/app/globals.css`: tokens de paleta en `@theme`, `body` con fondo `#F6ECDF`, color `#3F362E` y font Nunito; quitar el bloque dark/Geist.
+2. `src/app/layout.tsx`: reemplazar Geist por Fredoka + Nunito con `next/font/google`, `lang="es"`, metadata "OpenDayCare".
+3. `src/data/posts.ts`: tipos + `currentUser` + 3 posts con el contenido exacto del mock.
+4. `src/components/icons.tsx`: SVGs inline (home, users, bell, user, logout, plus, camera, heart, message, megaphone).
+5. `src/components/sidebar.tsx`: marca, botón "Nueva publicación", nav, bloque usuario, logout.
+6. `src/components/post-card.tsx`: avatar, nombre, "publicado por vos", badge por tipo, audiencia, cuerpo, placeholder de foto, likes/comentarios, "Editar".
+7. `src/components/composer.tsx`: tarjeta "Compartí un momento…".
+8. `src/app/page.tsx`: compone Sidebar + Main (cabecera, composer, divider "PUBLICADO HOY", posts desde `posts`).
 9. Verificación: `npm run lint`, `npx tsc --noEmit`, `npm run build` y comparación visual contra `references/pantallas/feed.dc.html`.
 
 ## Acceptance criteria
 
-- [ ] `/` se ve idéntico al mock a ≥1200px (colores, fuentes, espaciados y copy).
-- [ ] Sidebar completo con los 4 items de nav, bloque usuario y logout, todo inert.
-- [ ] Cabecera con "GUARDERÍA · SALA SOLES", "Buenas, Caro" y "12 niños · martes 17 jun".
-- [ ] Los 3 posts renderizan copy, badges y contadores exactos del mock (3/1, 5/2, 8/0).
-- [ ] Los posts se renderizan desde `app/data/posts.ts` tipado.
-- [ ] Fredoka en títulos y Nunito en cuerpo; sin Geist.
-- [ ] Paleta definida como tokens en `@theme` y usada por los componentes.
-- [ ] A <1024px el sidebar se oculta y el contenido ocupa el ancho completo.
-- [ ] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan.
-- [ ] Sin auth, sin BD, sin navegación real (enlaces inertes).
+- [x] `/` se ve idéntico al mock a ≥1200px (colores, fuentes, espaciados y copy).
+- [x] Sidebar completo con los 4 items de nav, bloque usuario y logout, todo inert.
+- [x] Cabecera con "GUARDERÍA · SALA SOLES", "Buenas, Caro" y "12 niños · martes 17 jun".
+- [x] Los 3 posts renderizan copy, badges y contadores exactos del mock (3/1, 5/2, 8/0).
+- [x] Los posts se renderizan desde `src/data/posts.ts` tipado.
+- [x] Fredoka en títulos y Nunito en cuerpo; sin Geist.
+- [x] Paleta definida como tokens en `@theme` y usada por los componentes.
+- [x] A <1024px el sidebar se oculta y el contenido ocupa el ancho completo.
+- [x] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan.
+- [x] Sin auth, sin BD, sin navegación real (enlaces inertes).
 
 ## Decisions
 
