@@ -1,6 +1,6 @@
 # SPEC 08 — CLI de Supabase y migraciones como fuente de verdad en git
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 07
 > **Date:** 2026-09-05
 > **Objective:** Instalar la CLI de Supabase, inicializar el proyecto local y adoptar `supabase/migrations/` como única fuente de verdad para cambios de esquema, registrando las migraciones de SPEC 07 como archivos físicos trackeados por git.
@@ -68,17 +68,17 @@ Cada paso deja el sistema funcional:
 
 ## Acceptance criteria
 
-- [ ] `supabase --version` devuelve una v2.x instalada vía Scoop.
-- [ ] Existe `supabase/config.toml` (sin secretos) y `supabase/migrations/` en el repo.
-- [ ] `supabase login` quedó autenticado (usuario completó el flujo del navegador).
-- [ ] `supabase link --project-ref mcilycrcsfmbepzcxsxa` quedó vinculado.
-- [ ] Existen los dos archivos de migración con el SQL idéntico al registrado en `supabase_migrations.schema_migrations`.
-- [ ] `supabase migration list` muestra local y remoto en sync.
-- [ ] `supabase db push --dry-run` reporta sin migraciones pendientes.
-- [ ] Los 3 registros de `daycares` se conservan en remoto (nada destructivo).
-- [ ] `AGENTS.md` documenta el flujo obligatorio: `supabase migration new <nombre>` (o `db diff`) para todo cambio de esquema/RLS/políticas, archivo como fuente de verdad.
-- [ ] `npm run lint` y `npx tsc --noEmit` siguen pasando.
-- [ ] `get_advisors` (security) sin issues nuevos.
+- [x] `supabase --version` devuelve una v2.x instalada vía Scoop.
+- [x] Existe `supabase/config.toml` (sin secretos) y `supabase/migrations/` en el repo.
+- [x] `supabase login` quedó autenticado (usuario completó el flujo del navegador).
+- [x] `supabase link --project-ref mcilycrcsfmbepzcxsxa` quedó vinculado.
+- [x] Existen los dos archivos de migración con el SQL idéntico al registrado en `supabase_migrations.schema_migrations`.
+- [x] `supabase migration list` muestra local y remoto en sync.
+- [x] `supabase db push --dry-run` reporta sin migraciones pendientes.
+- [x] Los 3 registros de `daycares` se conservan en remoto (nada destructivo).
+- [x] `AGENTS.md` documenta el flujo obligatorio: `supabase migration new <nombre>` (o `db diff`) para todo cambio de esquema/RLS/políticas, archivo como fuente de verdad.
+- [x] `npm run lint` y `npx tsc --noEmit` siguen pasando.
+- [x] `get_advisors` (security) sin issues nuevos.
 
 ## Decisions
 
