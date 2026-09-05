@@ -49,6 +49,27 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 - Playwright Screenshots y cualquier cos relacionada a Playwright tienen que estar en la carpeta .playwritht-mcp
 - CONTEXT7: usaremos este MCP para traer documentacion actualizada del framework.
+- SUPABASE: MCP oficial de Supabase conectado al proyecto. Ver sección `Supabase`.
+
+## Supabase
+
+- El proyecto usa Supabase como backend. Credenciales en `.env` (ver `.env.template`):
+  - `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (publishable, para el cliente).
+  - `SUPABASE_DB_PASSWORD` (para la CLI). Nunca exponer la `service_role` en el cliente.
+- El esquema de referencia de la base de datos está en la referencia `docs` (`../info-database`): tablas, columnas y relaciones. **No está implementado** en la base de datos todavía.
+- Uso del MCP de Supabase:
+  - `list_tables` para revisar el esquema actual antes de cualquier cambio.
+  - `apply_migration` para DDL (migraciones versionadas).
+  - `execute_sql` para consultas e iterar sin escribir historial de migraciones.
+  - `get_advisors` (seguridad/rendimiento) y `query_logs` (logs) para diagnóstico.
+  - `search_docs` para documentación actual (verificar contra changelog antes de implementar, Supabase cambia seguido).
+- CLI: `supabase db query` requiere v2.79+ y `supabase db advisors` v2.81.3+; si fallan, usar el MCP como fallback.
+- Seguridad: RLS activo en toda tabla expuesta, nunca usar `user_metadata` para autorización, vistas con `security_invoker`.
+
+## SKILLS INSTALADAS
+
+- **supabase** (`.agents/skills/supabase/`): cargar SIEMPRE para cualquier tarea que toque Supabase (Database, Auth, Edge Functions, Realtime, Storage, RLS, migraciones, logs, debugging de errores).
+- **supabase-postgres-best-practices** (`.agents/skills/supabase-postgres-best-practices/`): cargar ANTES de escribir o modificar cualquier cosa en Postgres (crear/alterar tablas y columnas, esquemas, migraciones, RLS, índices, triggers) y para diagnosticar queries lentas o problemas de rendimiento.
 
 ## SPEC DRIVEN DEVELOPMENT - SKILLS
 
