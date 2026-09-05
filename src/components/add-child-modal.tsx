@@ -62,23 +62,35 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
             Cancelar
           </button>
           <span className="font-display text-[18px] font-semibold text-ink">Agregar niño</span>
-          <button type="button" onClick={onClose} className="text-[15px] font-extrabold text-accent">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={!isFormValid}
+            className="text-[15px] font-extrabold text-accent disabled:cursor-not-allowed disabled:text-ink-faint"
+          >
             Guardar
           </button>
         </div>
 
         {/* Formulario */}
         <div className="px-[26px] py-6">
-          <div className="mb-2 text-[12px] font-extrabold tracking-[.7px] text-ink-muted">
-            NOMBRE COMPLETO
+          <div className="mb-[18px]">
+            <div className="mb-2 text-[12px] font-extrabold tracking-[.7px] text-ink-muted">
+              NOMBRE COMPLETO
+            </div>
+            <input
+              type="text"
+              placeholder="Ej. Martina López"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={`w-full rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] text-[15px] text-ink outline-none placeholder:text-[#B6A99B] ${
+                nameError ? "border-[#E5484D]" : "border-field-border"
+              }`}
+            />
+            {nameError && (
+              <div className="mt-1.5 text-[13px] font-semibold text-[#E5484D]">El nombre es obligatorio</div>
+            )}
           </div>
-          <input
-            type="text"
-            placeholder="Ej. Martina López"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-field-border bg-white px-4 py-[13px] text-[15px] text-ink outline-none placeholder:text-[#B6A99B]"
-          />
 
           <div className="mb-[18px] flex gap-[14px]">
             <div className="flex-1">
@@ -90,8 +102,15 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
                 placeholder="dd/mm/aaaa"
                 value={birthDate}
                 onChange={(e) => setBirthDate(e.target.value)}
-                className="w-full rounded-[14px] border-[1.5px] border-field-border bg-white px-4 py-[13px] text-[15px] text-ink outline-none placeholder:text-[#B6A99B]"
+                className={`w-full rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] text-[15px] text-ink outline-none placeholder:text-[#B6A99B] ${
+                  birthDateError ? "border-[#E5484D]" : "border-field-border"
+                }`}
               />
+              {birthDateError && (
+                <div className="mt-1.5 text-[13px] font-semibold text-[#E5484D]">
+                  Fecha inválida (formato dd/mm/aaaa)
+                </div>
+              )}
             </div>
             <div className="flex-1">
               <div className="mb-2 text-[12px] font-extrabold tracking-[.7px] text-ink-muted">SALA</div>
