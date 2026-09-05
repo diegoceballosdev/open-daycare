@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Sidebar from "@/components/sidebar";
 import ChildCard from "@/components/child-card";
 import ChildSearch from "@/components/child-search";
@@ -5,6 +8,7 @@ import { PlusIcon } from "@/components/icons";
 import { children } from "@/data/children";
 
 export default function ChildrenPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className="flex min-h-screen bg-cream">
       <Sidebar />
@@ -16,13 +20,14 @@ export default function ChildrenPage() {
               <div className="mb-1 text-[12.5px] font-extrabold tracking-[.8px] text-accent">GESTIÓN</div>
               <h1 className="m-0 font-display text-[30px] font-semibold text-ink">Niños</h1>
             </div>
-            <a
-              href="#"
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
               className="flex items-center gap-2 rounded-[14px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] px-[18px] py-[11px] text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,.7)]"
             >
               <PlusIcon />
               Agregar niño
-            </a>
+            </button>
           </div>
 
           <ChildSearch />
