@@ -1,5 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import type { Child, Parent, ParentStatus } from "@/data/children";
 import { AlertIcon, PlusIcon, SummaryIcon } from "@/components/icons";
+import LinkParentModal from "@/components/link-parent-modal";
 
 interface ChildProfileProps {
   child: Child;
@@ -18,6 +22,7 @@ function statusBadge(status: ParentStatus): string {
 
 // Perfil de un niño: cabecera, alergias, info y padres vinculados
 export default function ChildProfile({ child }: ChildProfileProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   return (
     <div className="flex flex-wrap items-start gap-[26px]">
       {/* Columna izquierda */}
@@ -116,15 +121,17 @@ export default function ChildProfile({ child }: ChildProfileProps) {
             ))}
 
             {/* Vincular otro padre */}
-            <a href="#" className="flex items-center gap-3 pt-2">
+            <button type="button" onClick={() => setIsModalOpen(true)} className="flex items-center gap-3 pt-2">
               <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full border-[1.5px] border-dashed border-[#D8CBBA] text-photo-ink">
                 <PlusIcon />
               </span>
               <span className="text-[14.5px] font-extrabold text-accent-edit">Vincular otro padre</span>
-            </a>
+            </button>
           </div>
         </div>
       </div>
+
+      <LinkParentModal child={child} open={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
