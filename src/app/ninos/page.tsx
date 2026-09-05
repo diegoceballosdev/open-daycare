@@ -4,6 +4,7 @@ import { useState } from "react";
 import Sidebar from "@/components/sidebar";
 import ChildCard from "@/components/child-card";
 import ChildSearch from "@/components/child-search";
+import AddChildModal from "@/components/add-child-modal";
 import { PlusIcon } from "@/components/icons";
 import { children } from "@/data/children";
 
@@ -47,6 +48,8 @@ export default function ChildrenPage() {
           </div>
         </div>
       </main>
+
+      <AddChildModal open={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }
