@@ -37,7 +37,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Workflow
 
-- Large features: `spec` skill first, then `spec-impl` only when status is Approved / Aprobado. Specs go in `specs/NN-slug.md` (folder may not exist yet).
+- Large features: `spec` skill first, then `spec-impl` only when status is Approved / Aprobado. Specs go in `specs/NN-slug.md` (folder may not exist yet). Las specs relacionadas con la base de datos (esquema, migraciones, RLS, triggers, enums, seeds) se guardan en `specs/database/NN-slug.md`.
 - Playwright MCP screenshots and related artifacts go in `.playwright-mcp/` (gitignored). Do not write them elsewhere.
 - Use the Context7 MCP for current Next.js / React / Tailwind docs even when you think you know the API.
 

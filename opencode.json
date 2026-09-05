@@ -14,7 +14,7 @@
     "bash": "allow"
   },
   "references": {
-    "docs": {
+    "db-schema": {
       "path": "../info-database",
       "description": "Schema de la base de datos del sistema open-daycare. Incluye tablas, columnas y referencias a crear. Esto no esta implementado en la base de datos, es solo para referencia"
     }
