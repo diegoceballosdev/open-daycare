@@ -231,3 +231,21 @@ export function SearchIcon(props: IconProps) {
     </IconTemplate>
   );
 }
+
+// Icono de menú hamburguesa (abrir sidebar en móvil)
+export function MenuIcon(props: IconProps) {
+  return (
+    <IconTemplate size={20} {...props}>
+      <path d="M3 6h18M3 12h18M3 18h18" />
+    </IconTemplate>
+  );
+}
+
+// Icono de cruz (cerrar sidebar en móvil)
+export function XIcon(props: IconProps) {
+  return (
+    <IconTemplate size={20} {...props}>
+      <path d="m18 6-12 12M6 6l12 12" />
+    </IconTemplate>
+  );
+}

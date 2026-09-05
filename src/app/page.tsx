@@ -1,12 +1,19 @@
+"use client";
+
+import { useState } from "react";
 import Sidebar from "@/components/sidebar";
 import Composer from "@/components/composer";
+import NewPostModal from "@/components/new-post-modal";
 import PostCard from "@/components/post-card";
 import { posts } from "@/data/posts";
 
 export default function Home() {
+  // Estado de apertura del modal "Nueva publicación"
+  const [newPostOpen, setNewPostOpen] = useState(false);
+
   return (
     <div className="flex min-h-screen bg-cream">
-      <Sidebar />
+      <Sidebar onNewPost={() => setNewPostOpen(true)} />
       <main className="h-screen min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[760px] px-10 pb-20 pt-[34px]">
           {/* Cabecera */}
@@ -18,7 +25,7 @@ export default function Home() {
             <p className="mt-[5px] text-[14.5px] text-ink-muted">12 niños · martes 17 jun</p>
           </div>
 
-          <Composer />
+          <Composer onOpen={() => setNewPostOpen(true)} />
 
           {/* Separador PUBLICADO HOY */}
           <div className="mb-[14px] flex items-center gap-[14px]">
@@ -34,6 +41,8 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      <NewPostModal open={newPostOpen} onClose={() => setNewPostOpen(false)} />
     </div>
   );
 }
