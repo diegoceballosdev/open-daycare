@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 
 interface AddChildModalProps {
   open: boolean;
@@ -51,11 +51,18 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
   const birthDateError = !isValidBirthDate(birthDate.trim());
   const isFormValid = !nameError && !birthDateError;
 
+  // "Guardar" cierra el modal solo si la validación pasa
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (isFormValid) onClose();
+  }
+
   if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/45 px-6 py-10">
       <div className="w-full max-w-[520px] overflow-hidden rounded-[24px] border border-line bg-auth-bg shadow-[0_20px_50px_-24px_rgba(63,54,46,.35)]">
+        <form onSubmit={handleSubmit}>
         {/* Cabecera */}
         <div className="flex items-center justify-between border-b border-line px-[26px] py-5">
           <button type="button" onClick={onClose} className="text-[15px] font-bold text-ink-muted">
@@ -63,8 +70,7 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
           </button>
           <span className="font-display text-[18px] font-semibold text-ink">Agregar niño</span>
           <button
-            type="button"
-            onClick={onClose}
+            type="submit"
             disabled={!isFormValid}
             className="text-[15px] font-extrabold text-accent disabled:cursor-not-allowed disabled:text-ink-faint"
           >
@@ -153,6 +159,7 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
             className="min-h-[90px] w-full resize-y rounded-[14px] border-[1.5px] border-field-border bg-white px-4 py-[13px] text-[15px] leading-[1.5] text-ink outline-none placeholder:text-[#B6A99B]"
           />
         </div>
+        </form>
       </div>
     </div>
   );
