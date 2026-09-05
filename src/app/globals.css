@@ -69,6 +69,18 @@
   --color-photo-bg: #f4ece1;
   --color-photo-ink: #b0a290;
   --color-photo-line: #dbcdba;
+  /* Fondo de las pantallas de autenticación (login y activación) */
+  --color-auth-bg: #fbf4ec;
+  /* Borde de los campos de formulario */
+  --color-field-border: #eadfd0;
+  /* Gradiente salmón (panel izquierdo del login y logo de activar) */
+  --color-peach-light: #f6a98e;
+  --color-peach: #f2937a;
+  --color-peach-deep: #ec7e62;
+  /* Consentimiento (fondo, texto e check) */
+  --color-consent-bg: #fbf1d6;
+  --color-consent-ink: #8a7234;
+  --color-consent-check: #5fb97e;
 }
 
 @theme inline {
