@@ -48,20 +48,20 @@ Cada paso deja la app funcional:
 
 ## Acceptance criteria
 
-- [ ] Hacer click en "Agregar niño" en `/ninos` abre el modal superpuesto sobre la lista.
-- [ ] El modal es pixel-idéntico al mock `agregar-nino.dc.html` (cabecera Cancelar / "Agregar niño" / Guardar, y campos NOMBRE COMPLETO, FECHA DE NACIMIENTO, SALA, ALERGIAS, NOTAS MÉDICAS).
-- [ ] El campo SALA muestra "Soles" y no es editable.
-- [ ] Dejar NOMBRE COMPLETO vacío muestra un error bajo el campo y bloquea "Guardar".
-- [ ] FECHA DE NACIMIENTO con formato inválido (no `dd/mm/aaaa`) muestra error.
-- [ ] FECHA DE NACIMIENTO con día/mes/año imposibles (ej. `31/02/2022`) muestra error.
-- [ ] FECHA DE NACIMIENTO futura muestra error.
-- [ ] FECHA DE NACIMIENTO válida (ej. `12/03/2022`) no muestra error.
-- [ ] ALERGIAS y NOTAS MÉDICAS son opcionales y no disparan error.
-- [ ] "Cancelar" cierra el modal siempre, sin validar.
-- [ ] "Guardar" cierra el modal solo cuando el formulario es válido.
-- [ ] Con el formulario inválido, "Guardar" está deshabilitado.
-- [ ] No se persiste ni se añade el niño a la lista (el array `children` no cambia).
-- [ ] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan.
+- [x] Hacer click en "Agregar niño" en `/ninos` abre el modal superpuesto sobre la lista.
+- [x] El modal es pixel-idéntico al mock `agregar-nino.dc.html` (cabecera Cancelar / "Agregar niño" / Guardar, y campos NOMBRE COMPLETO, FECHA DE NACIMIENTO, SALA, ALERGIAS, NOTAS MÉDICAS).
+- [x] El campo SALA muestra "Soles" y no es editable.
+- [x] Dejar NOMBRE COMPLETO vacío muestra un error bajo el campo y bloquea "Guardar".
+- [x] FECHA DE NACIMIENTO con formato inválido (no `dd/mm/aaaa`) muestra error.
+- [x] FECHA DE NACIMIENTO con día/mes/año imposibles (ej. `31/02/2022`) muestra error.
+- [x] FECHA DE NACIMIENTO futura muestra error.
+- [x] FECHA DE NACIMIENTO válida (ej. `12/03/2022`) no muestra error.
+- [x] ALERGIAS y NOTAS MÉDICAS son opcionales y no disparan error.
+- [x] "Cancelar" cierra el modal siempre, sin validar.
+- [x] "Guardar" cierra el modal solo cuando el formulario es válido.
+- [x] Con el formulario inválido, "Guardar" está deshabilitado.
+- [x] No se persiste ni se añade el niño a la lista (el array `children` no cambia).
+- [x] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan.
 
 ## Decisions
 
