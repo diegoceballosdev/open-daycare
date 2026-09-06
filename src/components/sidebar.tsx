@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { currentUser } from "@/data/posts";
+import { logout } from "@/app/auth/actions";
 import { BellIcon, HomeIcon, LogoutIcon, MenuIcon, PlusIcon, SunIcon, UserIcon, UsersIcon, XIcon } from "@/components/icons";
 
 // Items de navegación del sidebar (el estado activo depende de la ruta actual)
@@ -108,13 +109,15 @@ function DesktopSidebarContent({ pathname, onNewPost }: { pathname: string; onNe
             <div className="text-sm font-extrabold text-ink">{currentUser.name}</div>
             <div className="text-xs text-ink-faint">{currentUser.role}</div>
           </div>
-          <a
-            href="#"
-            title="Cerrar sesión"
-            className="flex h-8 w-8 flex-none items-center justify-center rounded-[10px] bg-cream text-ink-muted"
-          >
-            <LogoutIcon />
-          </a>
+          <form action={logout}>
+            <button
+              type="submit"
+              title="Cerrar sesión"
+              className="flex h-8 w-8 flex-none items-center justify-center rounded-[10px] bg-cream text-ink-muted"
+            >
+              <LogoutIcon />
+            </button>
+          </form>
         </div>
       </div>
     </aside>
@@ -174,13 +177,15 @@ function MobileSidebarContent({ pathname, onClose }: { pathname: string; onClose
             <div className="text-sm font-extrabold text-ink">{currentUser.name}</div>
             <div className="text-xs text-ink-faint">{currentUser.role}</div>
           </div>
-          <a
-            href="#"
-            title="Cerrar sesión"
-            className="flex h-8 w-8 flex-none items-center justify-center rounded-[10px] bg-cream text-ink-muted"
-          >
-            <LogoutIcon />
-          </a>
+          <form action={logout}>
+            <button
+              type="submit"
+              title="Cerrar sesión"
+              className="flex h-8 w-8 flex-none items-center justify-center rounded-[10px] bg-cream text-ink-muted"
+            >
+              <LogoutIcon />
+            </button>
+          </form>
         </div>
       </div>
     </aside>
