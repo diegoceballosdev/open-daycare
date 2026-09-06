@@ -57,6 +57,14 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   - `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (publishable, para el cliente).
   - `SUPABASE_DB_PASSWORD` (para la CLI). Nunca exponer la `service_role` en el cliente.
 - El esquema de referencia de la base de datos está en la referencia `docs` (`../info-database`): tablas, columnas y relaciones. **No está implementado** en la base de datos todavía.
+- **Cliente de base de datos (paquetes oficiales de Supabase para Next.js):** la app interactúa con la BD usando `@supabase/supabase-js` + `@supabase/ssr` (ya instalados). No usar otras librerías de acceso a datos.
+  - Helpers en `src/utils/supabase/`:
+    - `server.ts` → `createClient()` para Server Components, Server Actions y Route Handlers (usa `cookies()` de `next/headers`).
+    - `client.ts` → `createClient()` para Client Components (browser).
+    - `proxy.ts` → `updateSession()` refresca la sesión de auth en cada request.
+  - `src/proxy.ts` (antiguo `middleware.ts` en Next.js 16) llama a `updateSession` y exporta `proxy` con matcher para no correr en assets estáticos.
+  - Auth en el servidor: usar `supabase.auth.getClaims()` para proteger páginas y datos (valida el JWT). `getUser()` solo si se necesita el registro actualizado desde el server; **nunca** usar `getSession()` para autorización.
+  - No crear clientes en variables globales; crear uno nuevo por request en el servidor.
 - La CLI de Supabase está instalada (vía Scoop) y el proyecto está linkeado (`supabase link`). `supabase/migrations/` es la **única fuente de verdad** para cambios de esquema.
 - Flujo obligatorio para TODO cambio de esquema/RLS/políticas:
   1. Generar la migración local: `supabase migration new <nombre>` (SQL imperativo) o `supabase db diff -f <nombre>` (diff automático).
