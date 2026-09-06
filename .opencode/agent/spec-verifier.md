@@ -1,7 +1,7 @@
 ---
 description: Verifica los criterios de aceptación de una spec en specs/. Corrige el código si falla, usa Context7 para validar recomendaciones de Next.js y Playwright para verificación visual de pantallas. Seleccionable y usable como subagente.
 mode: all
-model: opencode-go/qwen3.6-plus
+model: opencode-go/deepseek-v4-flash-vision-exp
 permission:
   bash:
     "git commit*": deny
