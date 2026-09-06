@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { SunIcon } from "@/components/icons";
+import LoginForm from "./login-form";
 
 // Pantalla de inicio de sesión.
 // Fuente: references/pantallas/login.dc.html (sin el selector Personal/Familia, pedido del usuario).
@@ -49,44 +49,7 @@ export default function LoginPage() {
             Ingresá para ver el día de hoy.
           </p>
 
-          <div className="mb-[8px] text-[12px] font-bold tracking-[.7px] text-ink-muted">
-            EMAIL
-          </div>
-          <input
-            type="email"
-            defaultValue="caro@opendaycare.com"
-            className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-field-border bg-white p-[14px_16px] text-[15px] text-ink"
-          />
-          <div className="mb-[8px] text-[12px] font-bold tracking-[.7px] text-ink-muted">
-            CONTRASEÑA
-          </div>
-          <input
-            type="password"
-            placeholder="••••••••"
-            className="mb-[10px] w-full rounded-[14px] border-[1.5px] border-field-border bg-white p-[14px_16px] text-[15px] text-ink"
-          />
-          <div className="mb-[20px] text-right">
-            <a
-              href="#"
-              className="text-[13.5px] font-bold text-accent-edit"
-            >
-              ¿Olvidaste tu contraseña?
-            </a>
-          </div>
-
-          <Link
-            href="/"
-            className="block w-full rounded-[15px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] p-[15px] text-center text-[16px] font-extrabold text-white shadow-[0_10px_22px_-8px_rgba(238,129,100,.7)]"
-          >
-            Iniciar sesión
-          </Link>
-
-          <p className="mt-[24px] text-center text-[14.5px] text-ink-muted">
-            ¿Te invitó la guardería?{" "}
-            <Link href="/activar" className="font-extrabold text-accent-edit">
-              Activá tu cuenta
-            </Link>
-          </p>
+          <LoginForm />
         </div>
       </div>
     </div>
