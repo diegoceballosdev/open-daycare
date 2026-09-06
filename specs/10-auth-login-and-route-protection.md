@@ -1,6 +1,6 @@
 # SPEC 10 — Login real con Supabase y protección de rutas
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 03, SPEC 09
 > **Date:** 2026-09-05
 > **Objective:** Conectar el login de `/ingresar` a Supabase (email+password) y proteger las rutas de la app, redirigiendo según haya o no sesión.
@@ -39,16 +39,16 @@ Cada paso deja la app funcional:
 
 ## Acceptance criteria
 
-- [ ] Sin sesión, visitar `/`, `/ninos` o `/ninos/[id]` redirige a `/ingresar`.
-- [ ] Con sesión, visitar `/ingresar` o `/activar` redirige a `/`.
-- [ ] Login con `staff@opendaycare.com` / `Staff123!` inicia sesión y aterriza en `/`.
-- [ ] Credenciales inválidas muestran "Email o contraseña incorrectos." sin cambiar de página.
-- [ ] El botón muestra estado de envío mientras el login corre.
-- [ ] `/ingresar` mantiene la paridad visual con `login.dc.html` (salvo prefill staff y botón de submit real).
-- [ ] Cerrar sesión (desktop y mobile) redirige a `/ingresar`.
-- [ ] Tras logout, `/` vuelve a redirigir a `/ingresar`.
-- [ ] `/activar` permanece pública e inerte, sin cambios.
-- [ ] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan.
+- [x] Sin sesión, visitar `/`, `/ninos` o `/ninos/[id]` redirige a `/ingresar`.
+- [x] Con sesión, visitar `/ingresar` o `/activar` redirige a `/`.
+- [x] Login con `staff@opendaycare.com` / `Staff123!` inicia sesión y aterriza en `/`.
+- [x] Credenciales inválidas muestran "Email o contraseña incorrectos." sin cambiar de página.
+- [x] El botón muestra estado de envío mientras el login corre.
+- [x] `/ingresar` mantiene la paridad visual con `login.dc.html` (salvo prefill staff y botón de submit real).
+- [x] Cerrar sesión (desktop y mobile) redirige a `/ingresar`.
+- [x] Tras logout, `/` vuelve a redirigir a `/ingresar`.
+- [x] `/activar` permanece pública e inerte, sin cambios.
+- [x] `npm run lint`, `npx tsc --noEmit` y `npm run build` pasan.
 
 ## Decisions
 
