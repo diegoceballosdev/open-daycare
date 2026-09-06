@@ -1,7 +1,7 @@
 ---
 description: Verifica los criterios de aceptación de una spec usando el agente spec-verifier. Uso: /spec-verify <NN-slug>
 agent: spec-verifier
-model: opencode-go/qwen3.6-plus
+model: opencode-go/deepseek-v4-flash-vision-exp
 ---
 
 # /spec-verify
