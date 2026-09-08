@@ -1,19 +1,62 @@
-import type { Child } from "@/data/children";
-import { ChevronIcon } from "@/components/icons";
 import Link from "next/link";
 
+// Fila de `children` con la sala resuelta por el join en /ninos.
+export interface ChildWithRoom {
+  id: string;
+  full_name: string;
+  birth_date: string;
+  enrolled_at: string;
+  medical_notes: string | null;
+  allergy_tags: string[];
+  room_id: string | null;
+  rooms:
+    | { id: string; name: string }
+    | { id: string; name: string }[]
+    | null;
+}
+
 interface ChildCardProps {
-  child: Child;
+  child: ChildWithRoom;
 }
 
-// Texto de subtítulo según la cantidad de padres vinculados
-function parentsLabel(count: number): string {
-  if (count === 0) return "sin padres vinculados";
-  return `${count} padre${count > 1 ? "s" : ""} vinculado${count > 1 ? "s" : ""}`;
+// Paleta de avatar derivada del nombre (determinística, sin campos extra en BD)
+const AVATAR_PALETTES = [
+  { background: "#A9D9E8", foreground: "#1F7A93" },
+  { background: "#F4B8CC", foreground: "#C44A7A" },
+  { background: "#B9DEC4", foreground: "#3E8B62" },
+  { background: "#F4DC8E", foreground: "#9A7B1E" },
+  { background: "#C9B6E8", foreground: "#7B5FC0" },
+];
+
+function avatarPalette(name: string) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash + name.charCodeAt(i)) % AVATAR_PALETTES.length;
+  }
+  return AVATAR_PALETTES[hash];
 }
 
-// Tarjeta de niño de la lista: avatar, nombre, subtítulo y badge/flecha derivados de los datos
+// Inicial del nombre para el avatar
+function initials(fullName: string): string {
+  return fullName.trim().charAt(0).toUpperCase();
+}
+
+// Edad calculada desde birth_date (yyyy-mm-dd)
+function ageFromBirthDate(iso: string): number {
+  const [year, month, day] = iso.split("-").map(Number);
+  const today = new Date();
+  let age = today.getFullYear() - year;
+  const hasHadBirthday =
+    today.getMonth() + 1 > month || (today.getMonth() + 1 === month && today.getDate() >= day);
+  if (!hasHadBirthday) age -= 1;
+  return age;
+}
+
+// Tarjeta de niño de la lista: avatar, nombre, edad y badge/flecha derivados de la BD
 export default function ChildCard({ child }: ChildCardProps) {
+  const palette = avatarPalette(child.full_name);
+  const allergyBadge = child.allergy_tags[0]?.toUpperCase();
+
   return (
     <Link
       href={`/ninos/${child.id}`}
@@ -21,26 +64,24 @@ export default function ChildCard({ child }: ChildCardProps) {
     >
       <div
         className="flex h-12 w-12 flex-none items-center justify-center rounded-full font-display text-[19px] font-semibold"
-        style={{ backgroundColor: child.avatarBackground, color: child.avatarForeground }}
+        style={{ backgroundColor: palette.background, color: palette.foreground }}
       >
-        {child.initials}
+        {initials(child.full_name)}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="font-display text-base font-semibold text-ink">{child.name}</div>
+        <div className="font-display text-base font-semibold text-ink">{child.full_name}</div>
         <div className="text-[13px] text-ink-faint">
-          {child.age} años · {parentsLabel(child.parents.length)}
+          {ageFromBirthDate(child.birth_date)} años · sin padres vinculados
         </div>
       </div>
-      {child.allergyBadge ? (
+      {allergyBadge ? (
         <span className="flex-none rounded-full bg-warning-soft px-[9px] py-[5px] text-[11px] font-extrabold text-warning-ink">
-          {child.allergyBadge}
+          {allergyBadge}
         </span>
-      ) : child.parents.length === 0 ? (
+      ) : (
         <span className="flex-none rounded-full bg-pink-soft px-[9px] py-[5px] text-[11px] font-extrabold text-pink-deep">
           VINCULAR
         </span>
-      ) : (
-        <ChevronIcon className="flex-none text-[#CBB89F]" />
       )}
     </Link>
   );

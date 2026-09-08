@@ -1,60 +1,66 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { startTransition, useEffect, useState, type FormEvent } from "react";
+import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+import { addChild, type AddChildState } from "@/app/ninos/actions";
+import { isValidBirthDate } from "@/lib/child-validation";
 
 interface AddChildModalProps {
   open: boolean;
   onClose: () => void;
+  rooms: { id: string; name: string }[];
 }
 
-// ¿Es año bisiesto?
-function isLeapYear(year: number): boolean {
-  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
-}
+const initialState: AddChildState = {};
 
-// Días que tiene un mes (con el año para febrero)
-function daysInMonth(month: number, year: number): number {
-  if (month === 2) return isLeapYear(year) ? 29 : 28;
-  if (month === 4 || month === 6 || month === 9 || month === 11) return 30;
-  return 31;
-}
+// Modal "Agregar niño": replica el mock references/pantallas/agregar-nino.dc.html
+// y persiste vía la Server Action addChild.
+export default function AddChildModal({ open, onClose, rooms }: AddChildModalProps) {
+  const router = useRouter();
+  const [state, formAction, isPending] = useActionState(addChild, initialState);
 
-// Valida fecha de nacimiento en formato dd/mm/aaaa: día/mes/año reales y no futura
-function isValidBirthDate(value: string): boolean {
-  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
-  if (!match) return false;
+  const defaultRoom = rooms.find((room) => room.name === "Soles")?.id ?? rooms[0]?.id ?? "";
 
-  const day = Number(match[1]);
-  const month = Number(match[2]);
-  const year = Number(match[3]);
-
-  if (month < 1 || month > 12) return false;
-  if (day < 1 || day > daysInMonth(month, year)) return false;
-  if (year < 1) return false;
-
-  const today = new Date();
-  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const birthDate = new Date(year, month - 1, day);
-  if (birthDate > startOfToday) return false;
-
-  return true;
-}
-
-// Modal "Agregar niño": replica pixel a pixel el mock references/pantallas/agregar-nino.dc.html
-export default function AddChildModal({ open, onClose }: AddChildModalProps) {
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [room, setRoom] = useState(defaultRoom);
   const [allergies, setAllergies] = useState("");
   const [notes, setNotes] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   const nameError = name.trim() === "";
   const birthDateError = !isValidBirthDate(birthDate.trim());
-  const isFormValid = !nameError && !birthDateError;
+  const roomError = room === "";
+  const isFormValid = !nameError && !birthDateError && !roomError;
 
-  // "Guardar" cierra el modal solo si la validación pasa
+  // Los errores solo se muestran después del primer intento de guardado
+  const showNameError = submitted && nameError;
+  const showBirthDateError = submitted && birthDateError;
+  const showRoomError = submitted && roomError;
+
+  // En éxito: cierra el modal y refresca la lista de /ninos.
+  // onClose viene memoizado desde el padre, así la identidad es estable y
+  // el efecto corre una única vez por alta (state.success se resetea en cada
+  // dispatch pendiente), sin generar bucle de refrescos.
+  useEffect(() => {
+    if (!state.success) return;
+    onClose();
+    router.refresh();
+  }, [state.success, onClose, router]);
+
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (isFormValid) onClose();
+    setSubmitted(true);
+    if (!isFormValid) return;
+
+    const formData = new FormData();
+    formData.set("name", name);
+    formData.set("birthDate", birthDate);
+    formData.set("room", room);
+    formData.set("allergies", allergies);
+    formData.set("notes", notes);
+    startTransition(() => formAction(formData));
   }
 
   if (!open) return null;
@@ -71,15 +77,21 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
           <span className="font-display text-[18px] font-semibold text-ink">Agregar niño</span>
           <button
             type="submit"
-            disabled={!isFormValid}
+            disabled={isPending}
             className="text-[15px] font-extrabold text-accent disabled:cursor-not-allowed disabled:text-ink-faint"
           >
-            Guardar
+            {isPending ? "Guardando…" : "Guardar"}
           </button>
         </div>
 
         {/* Formulario */}
         <div className="px-[26px] py-6">
+          {state.error && (
+            <p className="mb-[14px] rounded-[12px] bg-red-50 p-[12px_14px] text-[14px] font-semibold text-red-600">
+              {state.error}
+            </p>
+          )}
+
           <div className="mb-[18px]">
             <div className="mb-2 text-[12px] font-extrabold tracking-[.7px] text-ink-muted">
               NOMBRE COMPLETO
@@ -90,10 +102,10 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={`w-full rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] text-[15px] text-ink outline-none placeholder:text-[#B6A99B] ${
-                nameError ? "border-[#E5484D]" : "border-field-border"
+                showNameError ? "border-[#E5484D]" : "border-field-border"
               }`}
             />
-            {nameError && (
+            {showNameError && (
               <div className="mt-1.5 text-[13px] font-semibold text-[#E5484D]">El nombre es obligatorio</div>
             )}
           </div>
@@ -109,10 +121,10 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
                 value={birthDate}
                 onChange={(e) => setBirthDate(e.target.value)}
                 className={`w-full rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] text-[15px] text-ink outline-none placeholder:text-[#B6A99B] ${
-                  birthDateError ? "border-[#E5484D]" : "border-field-border"
+                  showBirthDateError ? "border-[#E5484D]" : "border-field-border"
                 }`}
               />
-              {birthDateError && (
+              {showBirthDateError && (
                 <div className="mt-1.5 text-[13px] font-semibold text-[#E5484D]">
                   Fecha inválida (formato dd/mm/aaaa)
                 </div>
@@ -120,9 +132,20 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
             </div>
             <div className="flex-1">
               <div className="mb-2 text-[12px] font-extrabold tracking-[.7px] text-ink-muted">SALA</div>
-              <div className="flex items-center gap-2 rounded-[14px] border-[1.5px] border-field-border bg-white px-4 py-[13px] text-[15px] font-bold text-ink">
-                Soles
-                <span className="flex-1" />
+              <div className="relative">
+                <select
+                  value={room}
+                  onChange={(e) => setRoom(e.target.value)}
+                  className={`w-full appearance-none rounded-[14px] border-[1.5px] bg-white px-4 py-[13px] text-[15px] font-bold text-ink outline-none ${
+                    showRoomError ? "border-[#E5484D]" : "border-field-border"
+                  }`}
+                >
+                  {rooms.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
                 <svg
                   width="16"
                   height="16"
@@ -133,10 +156,14 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   aria-hidden="true"
+                  className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2"
                 >
                   <path d="m6 9 6 6 6-6" />
                 </svg>
               </div>
+              {showRoomError && (
+                <div className="mt-1.5 text-[13px] font-semibold text-[#E5484D]">La sala es obligatoria</div>
+              )}
             </div>
           </div>
 

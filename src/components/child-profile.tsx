@@ -1,44 +1,60 @@
 "use client";
 
 import { useState } from "react";
-import type { Child, Parent, ParentStatus } from "@/data/children";
+import type { ChildWithRoom } from "@/components/child-card";
 import { AlertIcon, PlusIcon, SummaryIcon } from "@/components/icons";
 import LinkParentModal from "@/components/link-parent-modal";
 
 interface ChildProfileProps {
-  child: Child;
+  child: ChildWithRoom;
 }
 
-// Texto descriptivo del estado del padre según parentesco y status
-function parentStatusText(parent: Parent): string {
-  if (parent.status === "pending") return "invitación enviada";
-  return parent.relationship === "Mamá" ? "activa" : "activo";
+// Meses cortos en español para fechas legibles
+const MONTHS_SHORT = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+
+// "2022-03-12" → "12 mar 2022"
+function formatBirthDate(iso: string): string {
+  const [year, month, day] = iso.split("-").map(Number);
+  return `${day} ${MONTHS_SHORT[month - 1]} ${year}`;
 }
 
-// Texto del badge de estado (ACTIVA/PENDIENTE)
-function statusBadge(status: ParentStatus): string {
-  return status === "active" ? "ACTIVA" : "PENDIENTE";
+// "2025-02-01" → "feb 2025"
+function formatEnrollmentDate(iso: string): string {
+  const [year, month] = iso.split("-").map(Number);
+  return `${MONTHS_SHORT[month - 1]} ${year}`;
+}
+
+// Edad calculada desde birth_date (yyyy-mm-dd)
+function ageFromBirthDate(iso: string): number {
+  const [year, month, day] = iso.split("-").map(Number);
+  const today = new Date();
+  let age = today.getFullYear() - year;
+  const hasHadBirthday =
+    today.getMonth() + 1 > month || (today.getMonth() + 1 === month && today.getDate() >= day);
+  if (!hasHadBirthday) age -= 1;
+  return age;
 }
 
 // Perfil de un niño: cabecera, alergias, info y padres vinculados
 export default function ChildProfile({ child }: ChildProfileProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const room = Array.isArray(child.rooms) ? child.rooms[0] : child.rooms;
+  const roomName = room?.name ?? "Sala";
+  const allergiesNote = child.medical_notes ?? (child.allergy_tags.length > 0 ? child.allergy_tags.join(", ") : null);
+
   return (
     <div className="flex flex-wrap items-start gap-[26px]">
       {/* Columna izquierda */}
       <div className="flex min-w-[300px] flex-1 flex-col gap-[18px]">
         {/* Cabecera */}
         <div className="flex items-center gap-[18px]">
-          <div
-            className="flex h-[84px] w-[84px] flex-none items-center justify-center rounded-full font-display text-[34px] font-semibold"
-            style={{ backgroundColor: child.avatarBackground, color: child.avatarForeground }}
-          >
-            {child.initials}
+          <div className="flex h-[84px] w-[84px] flex-none items-center justify-center rounded-full bg-[#A9D9E8] font-display text-[34px] font-semibold text-[#1F7A93]">
+            {child.full_name.trim().charAt(0).toUpperCase()}
           </div>
           <div className="flex-1">
-            <h1 className="m-0 font-display text-[28px] font-semibold text-ink">{child.name}</h1>
+            <h1 className="m-0 font-display text-[28px] font-semibold text-ink">{child.full_name}</h1>
             <p className="mt-[3px] text-[15px] text-ink-muted">
-              {child.age} años · Sala {child.room}
+              {ageFromBirthDate(child.birth_date)} años · Sala {roomName}
             </p>
           </div>
           <a
@@ -50,14 +66,14 @@ export default function ChildProfile({ child }: ChildProfileProps) {
         </div>
 
         {/* Tarjeta de alergias (solo si existe) */}
-        {child.allergiesNote && (
+        {allergiesNote && (
           <div className="flex gap-[14px] rounded-[16px] bg-warning px-[18px] py-4">
             <div className="flex h-10 w-10 flex-none items-center justify-center rounded-[11px] bg-[#F4A8A0]">
               <AlertIcon className="text-white" />
             </div>
             <div>
               <div className="mb-[2px] text-[15px] font-extrabold text-[#C5413A]">Alergias y notas</div>
-              <div className="text-[14.5px] leading-[1.5] text-[#B25249]">{child.allergiesNote}</div>
+              <div className="text-[14.5px] leading-[1.5] text-[#B25249]">{allergiesNote}</div>
             </div>
           </div>
         )}
@@ -66,15 +82,15 @@ export default function ChildProfile({ child }: ChildProfileProps) {
         <div className="overflow-hidden rounded-[16px] border border-line bg-surface">
           <div className="flex justify-between border-b border-divider px-[18px] py-[15px]">
             <span className="text-[14.5px] text-ink-muted">Fecha de nacimiento</span>
-            <span className="text-[14.5px] font-extrabold text-ink">{child.birthDate}</span>
+            <span className="text-[14.5px] font-extrabold text-ink">{formatBirthDate(child.birth_date)}</span>
           </div>
           <div className="flex justify-between border-b border-divider px-[18px] py-[15px]">
             <span className="text-[14.5px] text-ink-muted">Sala</span>
-            <span className="text-[14.5px] font-extrabold text-ink">{child.room}</span>
+            <span className="text-[14.5px] font-extrabold text-ink">{roomName}</span>
           </div>
           <div className="flex justify-between px-[18px] py-[15px]">
             <span className="text-[14.5px] text-ink-muted">Ingreso</span>
-            <span className="text-[14.5px] font-extrabold text-ink">{child.enrollmentDate}</span>
+            <span className="text-[14.5px] font-extrabold text-ink">{formatEnrollmentDate(child.enrolled_at)}</span>
           </div>
         </div>
       </div>
@@ -96,29 +112,7 @@ export default function ChildProfile({ child }: ChildProfileProps) {
             PADRES VINCULADOS
           </div>
           <div className="flex flex-col gap-[14px]">
-            {child.parents.map((parent) => (
-              <div key={parent.name} className="flex items-center gap-3">
-                <div
-                  className="flex h-10 w-10 flex-none items-center justify-center rounded-full font-display text-base font-semibold"
-                  style={{ backgroundColor: parent.avatarBackground, color: parent.avatarForeground }}
-                >
-                  {parent.initials}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[14.5px] font-extrabold text-ink">{parent.name}</div>
-                  <div className="text-[12.5px] text-ink-faint">
-                    {parent.relationship} · {parentStatusText(parent)}
-                  </div>
-                </div>
-                <span
-                  className={`flex-none rounded-full px-[9px] py-1 text-[10.5px] font-extrabold ${
-                    parent.status === "active" ? "bg-green-soft text-success" : "bg-yellow-soft text-yellow-ink"
-                  }`}
-                >
-                  {statusBadge(parent.status)}
-                </span>
-              </div>
-            ))}
+            <div className="text-[14px] text-ink-faint">Sin padres vinculados todavía</div>
 
             {/* Vincular otro padre */}
             <button type="button" onClick={() => setIsModalOpen(true)} className="flex items-center gap-3 pt-2">
