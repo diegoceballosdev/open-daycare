@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { Child } from "@/data/children";
+import type { ChildWithRoom } from "@/components/child-card";
 
 interface LinkParentModalProps {
-  child: Child;
+  child: ChildWithRoom;
   open: boolean;
   onClose: () => void;
 }
@@ -30,7 +30,7 @@ export default function LinkParentModal({ child, open, onClose }: LinkParentModa
         <div className="flex items-center justify-between border-b border-line px-[26px] py-5">
           <div>
             <div className="font-display text-[18px] font-semibold text-ink">Vincular padre</div>
-            <div className="text-[13px] text-ink-faint">a {child.name}</div>
+            <div className="text-[13px] text-ink-faint">a {child.full_name}</div>
           </div>
           <button
             type="button"
@@ -73,7 +73,7 @@ export default function LinkParentModal({ child, open, onClose }: LinkParentModa
               <path d="M12 16v-4M12 8h.01" />
             </svg>
             <span className="text-[13.5px] leading-[1.45] text-[#3F5694]">
-              Le enviaremos un correo con un código para que active su cuenta. Solo verá el feed de {child.name.split(" ")[0]}.
+              Le enviaremos un correo con un código para que active su cuenta. Solo verá el feed de {child.full_name.split(" ")[0]}.
             </span>
           </div>
 

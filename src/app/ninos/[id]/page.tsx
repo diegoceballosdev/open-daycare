@@ -1,12 +1,23 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
 import Sidebar from "@/components/sidebar";
 import ChildProfile from "@/components/child-profile";
 import { BackIcon } from "@/components/icons";
 import Link from "next/link";
-import { children } from "@/data/children";
 
 export default async function ChildProfilePage(props: PageProps<"/ninos/[id]">) {
   const { id } = await props.params;
-  const child = children.find((c) => c.id === id);
+  const supabase = await createClient();
+
+  const { data: child } = await supabase
+    .from("children")
+    .select("id, full_name, birth_date, enrolled_at, medical_notes, allergy_tags, room_id, rooms(id, name)")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (!child) {
+    redirect("/ninos");
+  }
 
   return (
     <div className="flex min-h-screen bg-cream">
@@ -19,13 +30,7 @@ export default async function ChildProfilePage(props: PageProps<"/ninos/[id]">) 
             Volver a Niños
           </Link>
 
-          {child ? (
-            <ChildProfile child={child} />
-          ) : (
-            <div className="rounded-[16px] border border-line bg-surface p-6 text-center text-[15px] text-ink-muted">
-              No encontramos a este niño.
-            </div>
-          )}
+          <ChildProfile child={child} />
         </div>
       </main>
     </div>
