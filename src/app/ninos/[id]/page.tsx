@@ -19,6 +19,9 @@ export default async function ChildProfilePage(props: PageProps<"/ninos/[id]">) 
     redirect("/ninos");
   }
 
+  // Padres vinculados con nombre (users es deny-all → se resuelve por RPC SECURITY DEFINER).
+  const { data: parents } = await supabase.rpc("get_child_parents", { p_child_id: id });
+
   return (
     <div className="flex min-h-screen bg-cream">
       <Sidebar />
@@ -30,7 +33,7 @@ export default async function ChildProfilePage(props: PageProps<"/ninos/[id]">) 
             Volver a Niños
           </Link>
 
-          <ChildProfile child={child} />
+          <ChildProfile child={child} parents={parents ?? []} />
         </div>
       </main>
     </div>
