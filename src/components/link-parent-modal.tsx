@@ -62,14 +62,15 @@ export default function LinkParentModal({ child, open, onClose }: LinkParentModa
           <div className="flex items-center justify-between border-b border-line px-[26px] py-5">
             <div>
               <div className="font-display text-[18px] font-semibold text-ink">Invitación enviada</div>
-              <div className="text-[13px] text-ink-faint">a {state.email}</div>
+              <div className="text-[13px] text-ink-faint">para {state.email}</div>
             </div>
           </div>
 
           {/* Contenido */}
           <div className="px-[26px] py-[22px]">
             <p className="mb-5 text-[14.5px] leading-[1.5] text-ink-muted">
-              Le enviamos el código por correo para que active su cuenta. Guardá este código por si lo necesita.
+              El código corresponde al correo de <strong>{state.email}</strong>. El mensaje se entregó al buzón
+              de pruebas <strong>{state.deliveryEmail}</strong>. Guardá este código por si lo necesita.
             </p>
 
             {/* Código de invitación generado */}

@@ -1,13 +1,18 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { activate, type ActivateState } from "@/app/activar/actions";
-import { createClient } from "@/utils/supabase/client";
 
 const initialState: ActivateState = {};
 
 interface ActivateFormProps {
-  initialCode?: string;
+  initialCode: string;
+  initialEmail: string;
+  invitation: {
+    childName: string;
+    relationship: string;
+  } | null;
+  validationError: string | null;
 }
 
 // Traducción del parentesco para la tarjeta de invitación.
@@ -18,35 +23,14 @@ const RELATIONSHIP_LABEL: Record<string, string> = {
 };
 
 // Formulario de activación de cuenta.
-// Valida la invitación (código+email) contra la BD y muestra al niño + parentesco cuando es válida.
-export default function ActivateForm({ initialCode = "" }: ActivateFormProps) {
+// El servidor valida código+email antes de mostrar el formulario de creación de cuenta.
+export default function ActivateForm({
+  initialCode,
+  initialEmail,
+  invitation,
+  validationError,
+}: ActivateFormProps) {
   const [state, formAction, isPending] = useActionState(activate, initialState);
-
-  // Validación en vivo: datos de la invitación una vez que código+email coinciden.
-  const [invitation, setInvitation] = useState<{
-    child_name: string;
-    relationship: string;
-  } | null>(null);
-
-  async function validateInvitation(code: string, email: string) {
-    if (code.trim() === "" || email.trim() === "") {
-      setInvitation(null);
-      return;
-    }
-
-    const supabase = createClient();
-    const { data } = await supabase.rpc("get_invitation_details", {
-      p_code: code.trim(),
-      p_email: email.trim(),
-    });
-
-    const details = data?.[0];
-    setInvitation(
-      details
-        ? { child_name: details.child_name, relationship: details.relationship }
-        : null
-    );
-  }
 
   return (
     <form action={formAction}>
@@ -54,12 +38,12 @@ export default function ActivateForm({ initialCode = "" }: ActivateFormProps) {
       {invitation && (
         <div className="mb-[22px] flex items-center gap-[14px] rounded-[16px] border-[1.5px] border-field-border bg-white p-[14px_16px]">
           <div className="flex h-[44px] w-[44px] items-center justify-center rounded-full bg-avatar-blue font-display text-[19px] font-semibold text-avatar-blue-ink">
-            {invitation.child_name.trim().charAt(0).toUpperCase()}
+            {invitation.childName.trim().charAt(0).toUpperCase()}
           </div>
           <div>
             <div className="text-[13px] text-ink-muted">Te invitaron a seguir a</div>
             <div className="font-display text-[17px] font-semibold text-ink">
-              {invitation.child_name} · {RELATIONSHIP_LABEL[invitation.relationship] ?? invitation.relationship}
+              {invitation.childName} · {RELATIONSHIP_LABEL[invitation.relationship] ?? invitation.relationship}
             </div>
           </div>
         </div>
@@ -71,12 +55,9 @@ export default function ActivateForm({ initialCode = "" }: ActivateFormProps) {
       <input
         name="code"
         defaultValue={initialCode}
-        onChange={(e) => {
-          const code = e.target.value;
-          const email = (document.querySelector('input[name="email"]') as HTMLInputElement)?.value ?? "";
-          void validateInvitation(code, email);
-        }}
-        className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-field-border bg-white p-[14px_16px] font-display text-[18px] font-bold tracking-[3px] text-ink"
+        readOnly
+        aria-readonly="true"
+        className="mb-[18px] w-full cursor-not-allowed rounded-[14px] border-[1.5px] border-field-border bg-divider p-[14px_16px] font-display text-[18px] font-bold tracking-[3px] text-ink"
       />
       <div className="mb-[8px] text-[12px] font-bold tracking-[.7px] text-ink-muted">
         EMAIL
@@ -84,13 +65,19 @@ export default function ActivateForm({ initialCode = "" }: ActivateFormProps) {
       <input
         type="email"
         name="email"
-        onChange={(e) => {
-          const email = e.target.value;
-          const code = (document.querySelector('input[name="code"]') as HTMLInputElement)?.value ?? "";
-          void validateInvitation(code, email);
-        }}
-        className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-field-border bg-white p-[14px_16px] text-[15px] text-ink"
+        defaultValue={initialEmail}
+        readOnly
+        aria-readonly="true"
+        className="mb-[18px] w-full cursor-not-allowed rounded-[14px] border-[1.5px] border-field-border bg-divider p-[14px_16px] text-[15px] text-ink"
       />
+      {validationError && (
+        <p className="mb-[18px] rounded-[12px] bg-red-50 p-[12px_14px] text-[14px] font-semibold text-red-600">
+          {validationError}
+        </p>
+      )}
+
+      {invitation && (
+        <>
       <div className="mb-[8px] text-[12px] font-bold tracking-[.7px] text-ink-muted">
         CREAR CONTRASEÑA
       </div>
@@ -121,6 +108,8 @@ export default function ActivateForm({ initialCode = "" }: ActivateFormProps) {
       >
         {isPending ? "Activando…" : "Activar mi cuenta"}
       </button>
+        </>
+      )}
     </form>
   );
 }

@@ -16,29 +16,41 @@ export async function activate(
 ): Promise<ActivateState> {
   const supabase = await createClient();
 
-  const code = String(formData.get("code") ?? "").trim();
+  const code = String(formData.get("code") ?? "").trim().toUpperCase();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const password = String(formData.get("password") ?? "");
   const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
-  // Validación server-side de contraseñas.
+  if (!/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/.test(code)) {
+    return { error: "Código no válido." };
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return { error: "Email no válido." };
+  }
+
+  // Valida la invitación y resuelve daycare_id + full_name para el signUp.
+  const { data: invitation, error: invitationError } = await supabase.rpc("get_invitation_details", {
+    p_code: code,
+    p_email: email,
+  });
+
+  const details = invitation?.[0];
+  if (invitationError) {
+    return { error: "No se pudo validar la invitación. Intentalo de nuevo." };
+  }
+
+  if (!details) {
+    return { error: "Código o email no válidos. Verificá que la invitación esté pendiente." };
+  }
+
+  // La invitación se valida antes que las contraseñas para impedir altas con enlaces alterados.
   if (password === "" || confirmPassword === "") {
     return { error: "Las contraseñas no pueden estar vacías." };
   }
 
   if (password !== confirmPassword) {
     return { error: "Las contraseñas no coinciden." };
-  }
-
-  // Valida la invitación y resuelve daycare_id + full_name para el signUp.
-  const { data: invitation } = await supabase.rpc("get_invitation_details", {
-    p_code: code,
-    p_email: email,
-  });
-
-  const details = invitation?.[0];
-  if (!details) {
-    return { error: "Código o email no válidos. Verificá que la invitación esté pendiente." };
   }
 
   const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
