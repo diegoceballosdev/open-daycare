@@ -12,6 +12,7 @@ import {
 interface InvitationEmailProps {
   childFirstName: string;
   code: string;
+  intendedEmail: string;
   origin?: string;
 }
 
@@ -20,9 +21,12 @@ interface InvitationEmailProps {
 export default function InvitationEmail({
   childFirstName,
   code,
+  intendedEmail,
   origin = "http://localhost:3000",
 }: InvitationEmailProps) {
-  const activateUrl = `${origin}/activar?code=${code}`;
+  const activateUrl = new URL("/activar", origin);
+  activateUrl.searchParams.set("code", code);
+  activateUrl.searchParams.set("email", intendedEmail);
 
   return (
     <Html lang="es">
@@ -57,6 +61,12 @@ export default function InvitationEmail({
             con el siguiente código.
           </Text>
 
+          <Text style={intendedEmailNote}>
+            El código de abajo corresponde a la cuenta{" "}
+            <strong>{intendedEmail}</strong>. Si ese email no es tuyo, podés
+            ignorar este correo.
+          </Text>
+
           {/* Código destacado */}
           <Section style={codeBox}>
             <Text style={codeLabel}>CÓDIGO DE INVITACIÓN</Text>
@@ -64,7 +74,7 @@ export default function InvitationEmail({
             <Text style={codeHint}>Vence en 7 días</Text>
           </Section>
 
-          <Button href={activateUrl} style={button}>
+          <Button href={activateUrl.toString()} style={button}>
             Activar mi cuenta
           </Button>
 
@@ -118,6 +128,14 @@ const subheading = {
   margin: "0 0 24px",
   fontSize: "15px",
   lineHeight: "1.55",
+  color: "#94887b",
+  textAlign: "center" as const,
+};
+
+const intendedEmailNote = {
+  margin: "0 0 24px",
+  fontSize: "13px",
+  lineHeight: "1.5",
   color: "#94887b",
   textAlign: "center" as const,
 };

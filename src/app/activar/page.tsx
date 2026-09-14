@@ -1,13 +1,42 @@
 import Link from "next/link";
 import { SunIcon } from "@/components/icons";
+import { createClient } from "@/utils/supabase/server";
 import ActivateForm from "./activate-form";
 
 // Pantalla de activación de cuenta.
 // Fuente: references/pantallas/activar-cuenta.dc.html
-// El código viene pre-relleno desde el enlace del correo (/activar?code=...).
+// El código y el email vienen desde el enlace del correo y se validan antes de mostrar el formulario.
 export default async function ActivateAccountPage(props: PageProps<"/activar">) {
   const searchParams = await props.searchParams;
-  const code = typeof searchParams.code === "string" ? searchParams.code : "";
+  const code = typeof searchParams.code === "string" ? searchParams.code.trim().toUpperCase() : "";
+  const email = typeof searchParams.email === "string" ? searchParams.email.trim().toLowerCase() : "";
+
+  let invitation: { childName: string; relationship: string } | null = null;
+  let validationError: string | null = null;
+
+  if (code === "" || email === "") {
+    validationError = "Abrí el enlace de activación que recibiste por correo.";
+  } else if (!/^[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{6}$/.test(code)) {
+    validationError = "Código no válido.";
+  } else {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc("get_invitation_details", {
+      p_code: code,
+      p_email: email,
+    });
+
+    const details = data?.[0];
+    if (error) {
+      validationError = "No se pudo validar la invitación. Intentalo de nuevo.";
+    } else if (!details) {
+      validationError = "La invitación no es válida, venció o ya fue utilizada.";
+    } else {
+      invitation = {
+        childName: details.child_name,
+        relationship: details.relationship,
+      };
+    }
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-auth-bg p-10">
@@ -24,7 +53,12 @@ export default async function ActivateAccountPage(props: PageProps<"/activar">) 
           activar la cuenta.
         </p>
 
-        <ActivateForm initialCode={code} />
+        <ActivateForm
+          initialCode={code}
+          initialEmail={email}
+          invitation={invitation}
+          validationError={validationError}
+        />
 
         <p className="mt-[22px] text-center text-[14.5px] text-ink-muted">
           ¿Ya tenés cuenta?{" "}
