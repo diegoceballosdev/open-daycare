@@ -4,7 +4,7 @@ import NinosPageClient from "@/components/ninos-page-client";
 export default async function ChildrenPage() {
   const supabase = await createClient();
 
-  const [{ data: children }, { data: rooms }] = await Promise.all([
+  const [{ data: children }, { data: rooms }, { data: parentLinks }] = await Promise.all([
     supabase
       .from("children")
       .select(
@@ -12,7 +12,14 @@ export default async function ChildrenPage() {
       )
       .order("created_at"),
     supabase.from("rooms").select("id, name").order("name"),
+    supabase.from("parent_children").select("child_id"),
   ]);
 
-  return <NinosPageClient kids={children ?? []} rooms={rooms ?? []} />;
+  // Conteo de padres vinculados por niño (para la tarjeta).
+  const parentCounts: Record<string, number> = {};
+  for (const link of parentLinks ?? []) {
+    parentCounts[link.child_id] = (parentCounts[link.child_id] ?? 0) + 1;
+  }
+
+  return <NinosPageClient kids={children ?? []} rooms={rooms ?? []} parentCounts={parentCounts} />;
 }

@@ -10,11 +10,12 @@ import { PlusIcon } from "@/components/icons";
 interface NinosPageClientProps {
   kids: ChildWithRoom[];
   rooms: { id: string; name: string }[];
+  parentCounts: Record<string, number>;
 }
 
 // Wrapper cliente de /ninos: dueño del estado del modal, el botón "Agregar niño" y la lista.
 // Recibe los niños y salas resueltos por el Server Component desde la BD.
-export default function NinosPageClient({ kids, rooms }: NinosPageClientProps) {
+export default function NinosPageClient({ kids, rooms, parentCounts }: NinosPageClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -61,7 +62,7 @@ export default function NinosPageClient({ kids, rooms }: NinosPageClientProps) {
           {filteredKids.length > 0 ? (
             <div className="grid grid-cols-2 gap-[14px]">
               {filteredKids.map((child) => (
-                <ChildCard key={child.id} child={child} />
+                <ChildCard key={child.id} child={child} parentCount={parentCounts[child.id] ?? 0} />
               ))}
             </div>
           ) : (

@@ -7,7 +7,15 @@ import LinkParentModal from "@/components/link-parent-modal";
 
 interface ChildProfileProps {
   child: ChildWithRoom;
+  parents: { full_name: string; relationship: "father" | "mother" | "guardian" }[];
 }
+
+// Traducción del parentesco para la lista del perfil.
+const RELATIONSHIP_LABEL: Record<string, string> = {
+  father: "Padre",
+  mother: "Madre",
+  guardian: "Tutor",
+};
 
 // Meses cortos en español para fechas legibles
 const MONTHS_SHORT = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
@@ -36,7 +44,7 @@ function ageFromBirthDate(iso: string): number {
 }
 
 // Perfil de un niño: cabecera, alergias, info y padres vinculados
-export default function ChildProfile({ child }: ChildProfileProps) {
+export default function ChildProfile({ child, parents }: ChildProfileProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const room = Array.isArray(child.rooms) ? child.rooms[0] : child.rooms;
   const roomName = room?.name ?? "Sala";
@@ -112,7 +120,23 @@ export default function ChildProfile({ child }: ChildProfileProps) {
             PADRES VINCULADOS
           </div>
           <div className="flex flex-col gap-[14px]">
-            <div className="text-[14px] text-ink-faint">Sin padres vinculados todavía</div>
+            {parents.length > 0 ? (
+              parents.map((parent, index) => (
+                <div key={index} className="flex items-center gap-[12px]">
+                  <div className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-purple font-display text-[16px] font-semibold text-white">
+                    {parent.full_name.trim().charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-[14.5px] font-extrabold text-ink">{parent.full_name}</div>
+                    <div className="text-[12.5px] text-ink-faint">
+                      {RELATIONSHIP_LABEL[parent.relationship] ?? parent.relationship}
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="text-[14px] text-ink-faint">Sin padres vinculados todavía</div>
+            )}
 
             {/* Vincular otro padre */}
             <button type="button" onClick={() => setIsModalOpen(true)} className="flex items-center gap-3 pt-2">

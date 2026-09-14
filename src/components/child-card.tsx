@@ -17,6 +17,7 @@ export interface ChildWithRoom {
 
 interface ChildCardProps {
   child: ChildWithRoom;
+  parentCount?: number;
 }
 
 // Paleta de avatar derivada del nombre (determinística, sin campos extra en BD)
@@ -53,9 +54,13 @@ function ageFromBirthDate(iso: string): number {
 }
 
 // Tarjeta de niño de la lista: avatar, nombre, edad y badge/flecha derivados de la BD
-export default function ChildCard({ child }: ChildCardProps) {
+export default function ChildCard({ child, parentCount = 0 }: ChildCardProps) {
   const palette = avatarPalette(child.full_name);
   const allergyBadge = child.allergy_tags[0]?.toUpperCase();
+  const parentsLabel =
+    parentCount > 0
+      ? `${parentCount} ${parentCount === 1 ? "padre" : "padres"} vinculado${parentCount === 1 ? "" : "s"}`
+      : "sin padres vinculados";
 
   return (
     <Link
@@ -71,7 +76,7 @@ export default function ChildCard({ child }: ChildCardProps) {
       <div className="min-w-0 flex-1">
         <div className="font-display text-base font-semibold text-ink">{child.full_name}</div>
         <div className="text-[13px] text-ink-faint">
-          {ageFromBirthDate(child.birth_date)} años · sin padres vinculados
+          {ageFromBirthDate(child.birth_date)} años · {parentsLabel}
         </div>
       </div>
       {allergyBadge ? (
