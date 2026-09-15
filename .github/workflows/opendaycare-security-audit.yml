@@ -1,0 +1,46 @@
+name: opencode-security-audit
+
+on:
+  schedule:
+    # Viernes 18:00 America/Argentina/Buenos_Aires (UTC-3) => 21:00 UTC
+    - cron: "0 21 * * 5"
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Run OpenCode security audit
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          SUPABASE_ACCESS_TOKEN_OPEN_DAYCARE: ${{ secrets.SUPABASE_ACCESS_TOKEN_OPEN_DAYCARE }}
+          # Inyecta el MCP de Supabase en CI: project-scoped, read-only y PAT por header.
+          OPENCODE_CONFIG_CONTENT: |
+            {
+              "mcp": {
+                "supabase": {
+                  "type": "remote",
+                  "url": "https://mcp.supabase.com/mcp?project_ref=mcilycrcsfmbepzcxsxa&read_only=true&features=database,docs,debugging",
+                  "enabled": true,
+                  "headers": { "Authorization": "Bearer {env:SUPABASE_ACCESS_TOKEN_OPEN_DAYCARE}" }
+                }
+              }
+            }
+        with:
+          model: opencode-go/deepseek-v4-flash
+          prompt: |
+            Ejecuta el comando /db-security-audit (auditoría completa, sin argumento).
+            Modo solo-reporte: NO crees migraciones ni ejecutes `supabase db push`.
+            Entrega el reporte de hallazgos (tabla + severidad + evidencia) y, si hay
+            hallazgos Críticos o Altos, abre un issue con el resumen.

@@ -1,11 +1,16 @@
+import type { Metadata } from "next";
 import { SunIcon } from "@/components/icons";
 import LoginForm from "./login-form";
+
+export const metadata: Metadata = {
+  title: "Iniciar sesión | OpenDayCare",
+};
 
 // Pantalla de inicio de sesión.
 // Fuente: references/pantallas/login.dc.html (sin el selector Personal/Familia, pedido del usuario).
 export default function LoginPage() {
   return (
-    <div className="grid min-h-screen grid-cols-1 bg-auth-bg lg:grid-cols-[1.05fr_1fr]">
+    <main className="grid min-h-screen grid-cols-1 bg-auth-bg lg:grid-cols-[1.05fr_1fr]">
       {/* Panel izquierdo con gradiente salmón, oculto por debajo de lg (1024px) */}
       <div className="relative hidden flex-col justify-between overflow-hidden bg-[linear-gradient(155deg,#F6A98E_0%,#F2937A_45%,#EC7E62_100%)] p-14 text-white lg:flex">
         {/* Círculos decorativos */}
@@ -36,13 +41,18 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <div className="relative text-[14px] text-white/90">🌿 Guardería Sala Soles</div>
+        <div className="relative text-[14px] text-white/90">
+          <span aria-hidden="true">🌿</span> Guardería Sala Soles
+        </div>
       </div>
 
       {/* Columna del formulario */}
       <div className="flex items-center justify-center p-10">
         <div className="w-full max-w-[392px]">
-          <h2 className="m-0 mb-[6px] font-display text-[30px] font-semibold text-ink">
+          <h2
+            id="login-heading"
+            className="m-0 mb-[6px] font-display text-[30px] font-semibold text-ink"
+          >
             Iniciar sesión
           </h2>
           <p className="m-0 mb-[28px] text-[15px] text-ink-muted">
@@ -52,6 +62,6 @@ export default function LoginPage() {
           <LoginForm />
         </div>
       </div>
-    </div>
+    </main>
   );
 }

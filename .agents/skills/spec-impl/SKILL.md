@@ -3,7 +3,7 @@ name: spec-impl
 description: Implements an approved spec. Validates that the state means "Approved" (in any language), creates a git branch named after the spec, switches to it, and starts the implementation step by step with pauses to review diffs.
 disable-model-invocation: true
 argument-hint: <NN-spec-name>
-allowed-tools: Read, Glob, Grep, Edit, Write, AskUserQuestion, Bash(git status:*), Bash(git branch:*), Bash(git checkout:*), Bash(git log:*), Bash(git diff:*), Bash(git stash:*), Bash(cat:*), Bash(ls:*)
+allowed-tools: Read, Glob, Grep, Edit, Write, Task, AskUserQuestion, Bash(git status:*), Bash(git branch:*), Bash(git checkout:*), Bash(git log:*), Bash(git diff:*), Bash(git stash:*), Bash(cat:*), Bash(ls:*)
 ---
 
 # /spec-impl — Implementer of approved specs
@@ -156,7 +156,12 @@ Once you have confirmed the state means `Approved`:
    - The **implementation plan** (the section with the numbered steps — `## Implementation plan` / `## Plan de implementación` / equivalent).
    - The **acceptance criteria** (the checklist — `## Acceptance criteria` / `## Criterios de aceptación` / equivalent).
 
-Match section headings by meaning, not by exact wording — the spec may be authored in any language.
+   Match section headings by meaning, not by exact wording — the spec may be authored in any language.
+
+5. **Detect the database steps.** Scan the implementation plan and flag every step that touches the database:
+   - It mentions migrations, SQL DDL (`create` / `alter table`, enums, indexes, constraints), RLS / policies, triggers, functions, seeds, or Supabase CLI commands (`supabase migration`, `supabase db push`).
+   - Or it comes from a spec under `specs/database/`.
+   - Tell the user which steps you detected as database steps and that you will delegate them to the `db-migrator` subagent.
 
 ---
 
@@ -185,6 +190,18 @@ Once confirmed, follow these rules during the entire implementation:
 - Show a summary of which files you touched and what you did.
 - Say: `Step N completed. Could you review the diff and let me know if I continue with Step N+1?`
 - Wait for confirmation before continuing.
+
+**Database steps — delegate to the `db-migrator` subagent:**
+
+When the current step is a database step (see Phase 3), do not implement it yourself. Delegate it to the `db-migrator` subagent:
+
+- Announce it to the user before delegating, for example:
+  `Step N is a database step. I am delegating it to the db-migrator subagent.`
+- Invoke it with the `task` tool using `subagent_type: "db-migrator"` (in Claude Code, the `Task` tool with the `db-migrator` subagent). The subagent owns the full database flow: it creates the missing files in `supabase/migrations/`, verifies with `supabase db push --dry-run`, and applies with `supabase db push` **only after asking the user for confirmation**.
+- Pass it enough context in the task prompt: the spec path, the exact step number and text, the required schema changes (taken from `Data model` / `Scope`), the hard constraints (only create missing migrations, never edit applied ones, never use the `apply_migration` MCP for DDL, push only after confirmation), and what it must return (migration files created, dry-run output, applied status, open decisions).
+- Do not duplicate its work while it runs. Wait for its result.
+- If the subagent reports an ambiguity or a decision outside the spec's scope, surface it to the user and wait — do not improvise.
+- When it returns, show its report/diff and then apply the usual pause: `Step N completed. Could you review the diff and let me know if I continue with Step N+1?`
 
 **If during the implementation you find an ambiguity** the spec does not resolve:
 
@@ -230,6 +247,13 @@ in your repo's language) and make the final commit before merging this branch.
   Phase 2  →  Reads the state → "Draft" → ❌ stops
               Shows the standard error message
               Does not create branch, does not touch code
+
+/spec-impl 04-agregar-nino  (plan contains database steps)
+
+  Phase 3  →  Flags the database steps to the user
+  Phase 4  →  On a database step → delegates to the db-migrator subagent
+              (the subagent creates/applies the migration after user confirmation)
+              → resumes the step-by-step rhythm for the next step
 ```
 
 **Branch creation is controlled by the `AutoCreateBranch` flag** in `specs/.spec-config.yml`. It defaults to `true` (create the branch automatically, as shown above). Set it to `false` to make Phase 3 ask `[y/N]` before creating the branch.
