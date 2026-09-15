@@ -1,9 +1,6 @@
-"use client";
-
-import { useState } from "react";
 import type { ChildWithRoom } from "@/components/child-card";
-import { AlertIcon, PlusIcon, SummaryIcon } from "@/components/icons";
-import LinkParentModal from "@/components/link-parent-modal";
+import { AlertIcon, SummaryIcon } from "@/components/icons";
+import LinkParentAction from "@/components/link-parent-action";
 
 interface ChildProfileProps {
   child: ChildWithRoom;
@@ -45,7 +42,6 @@ function ageFromBirthDate(iso: string): number {
 
 // Perfil de un niño: cabecera, alergias, info y padres vinculados
 export default function ChildProfile({ child, parents }: ChildProfileProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const room = Array.isArray(child.rooms) ? child.rooms[0] : child.rooms;
   const roomName = room?.name ?? "Sala";
   const allergiesNote = child.medical_notes ?? (child.allergy_tags.length > 0 ? child.allergy_tags.join(", ") : null);
@@ -121,8 +117,8 @@ export default function ChildProfile({ child, parents }: ChildProfileProps) {
           </div>
           <div className="flex flex-col gap-[14px]">
             {parents.length > 0 ? (
-              parents.map((parent, index) => (
-                <div key={index} className="flex items-center gap-[12px]">
+              parents.map((parent) => (
+                <div key={`${parent.full_name}-${parent.relationship}`} className="flex items-center gap-[12px]">
                   <div className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-purple font-display text-[16px] font-semibold text-white">
                     {parent.full_name.trim().charAt(0).toUpperCase()}
                   </div>
@@ -139,17 +135,10 @@ export default function ChildProfile({ child, parents }: ChildProfileProps) {
             )}
 
             {/* Vincular otro padre */}
-            <button type="button" onClick={() => setIsModalOpen(true)} className="flex items-center gap-3 pt-2">
-              <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full border-[1.5px] border-dashed border-[#D8CBBA] text-photo-ink">
-                <PlusIcon />
-              </span>
-              <span className="text-[14.5px] font-extrabold text-accent-edit">Vincular otro padre</span>
-            </button>
+            <LinkParentAction child={child} />
           </div>
         </div>
       </div>
-
-      <LinkParentModal child={child} open={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </div>
   );
 }

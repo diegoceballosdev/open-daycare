@@ -37,13 +37,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Workflow
 
-- Large features: `spec` skill first, then `spec-impl` only when status is Approved / Aprobado. Specs go in `specs/NN-slug.md` (folder may not exist yet). Las specs relacionadas con la base de datos (esquema, migraciones, RLS, triggers, enums, seeds) se guardan en `specs/database/NN-slug.md`.
+- Large features: `spec` skill first, then `spec-impl` only when status is Approved / Aprobado. Specs go in `specs/NN-slug.md` (folder may not exist yet). Las specs relacionadas con la base de datos (esquema, migraciones, RLS, triggers, enums, seeds) se guardan en `specs/database/NN-slug.md`. Al implementar una spec, `spec-impl` detecta los pasos de BD del plan y los delega como subagente al agente `db-migrator`.
 - Playwright MCP screenshots and related artifacts go in `.playwright-mcp/` (gitignored). Do not write them elsewhere.
 - Use the Context7 MCP for current Next.js / React / Tailwind docs even when you think you know the API.
 
 ## Agents
 
 - SPEC-VERIFIER: agent especializado en verificar especificaciones. Uso: `/spec-verify <NN-slug>` (acepta nombre completo, solo número o solo slug). Verifica cada check con evidencia, corrige el código si falla, valida recomendaciones Next.js con Context7, hace verificación visual con Playwright contra `references/pantallas/` y marca los checkboxes en el propio spec. Definido en `.opencode/agent/spec-verifier.md` y `.opencode/command/spec-verify.md`. No hace `git commit` ni `git push`; responde en el idioma del prompt (español por defecto).
+- REACT-BEST-PRACTICES: agent que aplica buenas prácticas de React (hooks, estado, efectos, server/client components, renderizado) a los archivos que se le indiquen. Uso: `/react-best-practices <archivos|globs>`. Aplica los cambios directamente, valida cada regla contra la documentación oficial con Context7 (`/react/react`, `/vercel/next.js`) y verifica con `npm run lint` y `npx tsc --noEmit`. Definido en `.opencode/agent/react-best-practices.md` y `.opencode/command/react-best-practices.md`. No hace `git commit` ni `git push`; responde en el idioma del prompt (español por defecto).
+- DB-MIGRATOR: agent que asegura que existan y estén aplicadas las migraciones descritas en las specs de `specs/database/`. Uso standalone: `/db-migrate <NN-slug|vacío>`. Genera las migraciones faltantes en `supabase/migrations/` (`supabase migration new` + SQL imperativo), verifica con `supabase db push --dry-run` y `get_advisors`, y aplica con `supabase db push` **solo tras confirmación del usuario**. La skill `spec-impl` lo invoca como subagente al detectar pasos de BD en el plan de implementación. Definido en `.opencode/agent/db-migrator.md` y `.opencode/command/db-migrate.md`. No hace `git commit` ni `git push`; responde en el idioma del prompt (español por defecto).
+- ACCESSIBILITY-CHECKER: agent que audita y corrige la accesibilidad del archivo o pantalla indicada siguiendo **WCAG 2.2 AA**. Uso: `/accessibility-check <archivo|glob>`. Revisa el código con un checklist WCAG, valida cada regla contra la documentación oficial vía Context7 y verifica de forma dinámica con Playwright (árbol de accesibilidad, teclado, foco, contraste y `axe-core`), aplica las correcciones preservando comportamiento y diseño, y verifica con `npm run lint` y `npx tsc --noEmit`. Definido en `.opencode/agent/accessibility-checker.md` y `.opencode/command/accessibility-check.md`. No hace `git commit` ni `git push`; responde en el idioma del prompt (español por defecto).
+- DB-SECURITY-AUDITOR: agent que audita la seguridad de Supabase (RLS, roles, policies, funciones `SECURITY DEFINER`, grants, vistas, storage/realtime y consumo desde `src/`) para **prevenir fugas de datos entre niños y padres** y entre daycares. Uso: `/db-security-audit <tabla|spec|vacío>`. Revisa migraciones y el esquema real con el MCP (read-only), confirma el comportamiento con pruebas de fuga simulando roles, clasifica por severidad y corrige con migraciones nuevas (`supabase migration new`), verificando con `supabase db push --dry-run` y `get_advisors`; aplica con `supabase db push` **solo tras confirmación del usuario**. Definido en `.opencode/agent/db-security-auditor.md` y `.opencode/command/db-security-audit.md`. No hace `git commit` ni `git push`; responde en el idioma del prompt (español por defecto).
 
 ## MCPs
 
@@ -89,6 +93,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - /spec usaremos esta skill para crear las especificaciones
 - /spec-impl usaremos esta skill para implementar las especificaciones
 - /spec-verify usaremos este comando (agente **spec-verifier**) para verificar los criterios de aceptación de una spec.
+- /db-migrate usaremos este comando (agente **db-migrator**) para asegurar y aplicar las migraciones de las specs de `specs/database/`.
 
 ## Reglas de codigo
 

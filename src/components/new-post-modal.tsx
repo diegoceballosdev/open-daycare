@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { ImageIcon, PlusIcon } from "@/components/icons";
 
 interface NewPostModalProps {
@@ -45,6 +45,20 @@ export default function NewPostModal({ open, onClose }: NewPostModalProps) {
   const [wholeRoom, setWholeRoom] = useState(false);
   const [selectedType, setSelectedType] = useState<PostType | null>(null);
   const [description, setDescription] = useState("");
+  const titleId = useId();
+  const descriptionLabelId = useId();
+
+  // Escape cierra el modal: el listener existe solo mientras está abierto y se limpia al cerrar/desmontar
+  useEffect(() => {
+    if (!open) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [open, onClose]);
 
   if (!open) return null;
 
@@ -80,13 +94,20 @@ export default function NewPostModal({ open, onClose }: NewPostModalProps) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="w-full max-w-[580px] overflow-hidden rounded-[24px] border border-line bg-auth-bg shadow-[0_20px_50px_-24px_rgba(63,54,46,.35)]">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="w-full max-w-[580px] overflow-hidden rounded-[24px] border border-line bg-auth-bg shadow-[0_20px_50px_-24px_rgba(63,54,46,.35)]"
+      >
         {/* Cabecera */}
         <div className="flex items-center justify-between border-b border-line px-[26px] py-5">
           <button type="button" onClick={onClose} className="text-[15px] font-bold text-ink-muted">
             Cancelar
           </button>
-          <span className="font-display text-[18px] font-semibold text-ink">Nueva publicación</span>
+          <h2 id={titleId} className="font-display text-[18px] font-semibold text-ink">
+            Nueva publicación
+          </h2>
           <button type="button" onClick={onClose} className="text-[15px] font-extrabold text-accent">
             Publicar
           </button>
@@ -96,13 +117,14 @@ export default function NewPostModal({ open, onClose }: NewPostModalProps) {
         <div className="px-[26px] py-6">
           {/* PARA */}
           <div className="mb-[10px] text-[12px] font-extrabold tracking-[.7px] text-ink-muted">PARA</div>
-          <div className="mb-[22px] flex flex-wrap gap-[9px]">
+          <div role="group" aria-label="Para" className="mb-[22px] flex flex-wrap gap-[9px]">
             {KIDS.map((kid) => {
               const isActive = selectedKids.has(kid.id);
               return (
                 <button
                   key={kid.id}
                   type="button"
+                  aria-pressed={isActive}
                   onClick={() => toggleKid(kid.id)}
                   className={`flex items-center gap-2 rounded-full border-[1.5px] py-[6px] pl-[6px] pr-[14px] text-[14px] font-bold ${
                     isActive ? "border-ink bg-ink text-white" : "border-line bg-surface text-ink-nav"
@@ -120,6 +142,7 @@ export default function NewPostModal({ open, onClose }: NewPostModalProps) {
             })}
             <button
               type="button"
+              aria-pressed={wholeRoom}
               onClick={selectWholeRoom}
               className={`rounded-full border-[1.5px] px-4 py-[6px] text-[14px] font-bold ${
                 wholeRoom ? "border-ink bg-ink text-white" : "border-line bg-surface text-ink-nav"
@@ -131,7 +154,7 @@ export default function NewPostModal({ open, onClose }: NewPostModalProps) {
 
           {/* TIPO */}
           <div className="mb-[10px] text-[12px] font-extrabold tracking-[.7px] text-ink-muted">TIPO</div>
-          <div className="mb-[22px] flex flex-wrap gap-[9px]">
+          <div role="group" aria-label="Tipo" className="mb-[22px] flex flex-wrap gap-[9px]">
             {POST_TYPES.map((type) => {
               const isActive = type === selectedType;
               const theme = typeTheme[type];
@@ -139,6 +162,7 @@ export default function NewPostModal({ open, onClose }: NewPostModalProps) {
                 <button
                   key={type}
                   type="button"
+                  aria-pressed={isActive}
                   onClick={() => toggleType(type)}
                   className="rounded-full px-4 py-2 text-[13.5px] font-extrabold"
                   style={
@@ -154,8 +178,11 @@ export default function NewPostModal({ open, onClose }: NewPostModalProps) {
           </div>
 
           {/* DESCRIPCIÓN */}
-          <div className="mb-[10px] text-[12px] font-extrabold tracking-[.7px] text-ink-muted">DESCRIPCIÓN</div>
+          <div id={descriptionLabelId} className="mb-[10px] text-[12px] font-extrabold tracking-[.7px] text-ink-muted">
+            DESCRIPCIÓN
+          </div>
           <textarea
+            aria-labelledby={descriptionLabelId}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Contá cómo le fue hoy…"

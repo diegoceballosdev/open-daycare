@@ -1,3 +1,5 @@
+"use client";
+
 import { SearchIcon } from "@/components/icons";
 
 interface ChildSearchProps {
@@ -12,6 +14,7 @@ export default function ChildSearch({ value, onChange }: ChildSearchProps) {
       <SearchIcon className="flex-none text-photo-ink" />
       <input
         type="text"
+        aria-label="Buscar niño"
         placeholder="Buscar niño…"
         value={value}
         onChange={(e) => onChange(e.target.value)}

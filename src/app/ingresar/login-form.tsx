@@ -10,25 +10,40 @@ const initialState: LoginState = {};
 // Muestra error inline y estado de envío mientras el login corre.
 export default function LoginForm() {
   const [state, formAction, isPending] = useActionState(login, initialState);
+  const hasError = Boolean(state?.error);
 
   return (
-    <form action={formAction}>
-      <div className="mb-[8px] text-[12px] font-bold tracking-[.7px] text-ink-muted">
+    <form action={formAction} aria-labelledby="login-heading">
+      <label
+        htmlFor="login-email"
+        className="mb-[8px] block text-[12px] font-bold tracking-[.7px] text-ink-muted"
+      >
         EMAIL
-      </div>
+      </label>
       <input
+        id="login-email"
         type="email"
         name="email"
+        autoComplete="username"
         defaultValue="staff@opendaycare.com"
+        aria-invalid={hasError}
+        aria-describedby={hasError ? "login-error" : undefined}
         className="mb-[18px] w-full rounded-[14px] border-[1.5px] border-field-border bg-white p-[14px_16px] text-[15px] text-ink"
       />
-      <div className="mb-[8px] text-[12px] font-bold tracking-[.7px] text-ink-muted">
+      <label
+        htmlFor="login-password"
+        className="mb-[8px] block text-[12px] font-bold tracking-[.7px] text-ink-muted"
+      >
         CONTRASEÑA
-      </div>
+      </label>
       <input
+        id="login-password"
         type="password"
         name="password"
+        autoComplete="current-password"
         placeholder="••••••••"
+        aria-invalid={hasError}
+        aria-describedby={hasError ? "login-error" : undefined}
         className="mb-[10px] w-full rounded-[14px] border-[1.5px] border-field-border bg-white p-[14px_16px] text-[15px] text-ink"
       />
       <div className="mb-[20px] text-right">
@@ -38,7 +53,11 @@ export default function LoginForm() {
       </div>
 
       {state?.error && (
-        <p className="mb-[14px] rounded-[12px] bg-red-50 p-[12px_14px] text-[14px] font-semibold text-red-600">
+        <p
+          id="login-error"
+          role="alert"
+          className="mb-[14px] rounded-[12px] bg-red-50 p-[12px_14px] text-[14px] font-semibold text-red-700"
+        >
           {state.error}
         </p>
       )}
