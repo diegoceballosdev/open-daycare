@@ -1,9 +1,18 @@
 "use client";
 
-import { currentUser } from "@/data/posts";
+import { currentUser } from "@/data/current-user";
 import { CameraIcon } from "@/components/icons";
 
-export default function Composer({ onOpen }: { onOpen: () => void }) {
+export default function Composer({
+  onOpen,
+  canPublish = true,
+}: {
+  onOpen: () => void;
+  canPublish?: boolean;
+}) {
+  // Sin permiso de publicación el composer no se muestra.
+  if (!canPublish) return null;
+
   return (
     <button
       type="button"
