@@ -48,6 +48,17 @@ export function UsersIcon(props: IconProps) {
   );
 }
 
+// Icono de equipo (nav "Equipo", solo visible para admin)
+export function TeamIcon(props: IconProps) {
+  return (
+    <IconTemplate size={19} {...props}>
+      <rect x="3" y="7" width="18" height="13" rx="2" />
+      <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+      <path d="M3 12h18" />
+    </IconTemplate>
+  );
+}
+
 // Icono de campana (nav "Avisos")
 export function BellIcon(props: IconProps) {
   return (

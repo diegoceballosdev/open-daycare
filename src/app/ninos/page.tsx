@@ -4,6 +4,13 @@ import NinosPageClient from "@/components/ninos-page-client";
 export default async function ChildrenPage() {
   const supabase = await createClient();
 
+  const { data: claims } = await supabase.auth.getClaims();
+  const { data: profile } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", claims?.claims?.sub ?? "")
+    .maybeSingle();
+
   const [{ data: children }, { data: rooms }, { data: parentLinks }] = await Promise.all([
     supabase
       .from("children")
@@ -21,5 +28,12 @@ export default async function ChildrenPage() {
     parentCounts[link.child_id] = (parentCounts[link.child_id] ?? 0) + 1;
   }
 
-  return <NinosPageClient kids={children ?? []} rooms={rooms ?? []} parentCounts={parentCounts} />;
+  return (
+    <NinosPageClient
+      kids={children ?? []}
+      rooms={rooms ?? []}
+      parentCounts={parentCounts}
+      isAdmin={profile?.role === "admin"}
+    />
+  );
 }

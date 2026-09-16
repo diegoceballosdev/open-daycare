@@ -5,39 +5,46 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { currentUser } from "@/data/current-user";
 import { logout } from "@/app/auth/actions";
-import { BellIcon, HomeIcon, LogoutIcon, MenuIcon, PlusIcon, SunIcon, UserIcon, UsersIcon, XIcon } from "@/components/icons";
+import { BellIcon, HomeIcon, LogoutIcon, MenuIcon, PlusIcon, SunIcon, TeamIcon, UserIcon, UsersIcon, XIcon } from "@/components/icons";
 
-// Items de navegación del sidebar (el estado activo depende de la ruta actual)
+// Items de navegación del sidebar (el estado activo depende de la ruta actual).
+// `adminOnly` se filtra según el rol real del usuario (prop `isAdmin`).
 const navItems = [
-  { label: "Feed", href: "/", icon: HomeIcon, isActive: (path: string) => path === "/" },
-  { label: "Niños", href: "/ninos", icon: UsersIcon, isActive: (path: string) => path.startsWith("/ninos") },
-  { label: "Avisos", href: "/avisos", icon: BellIcon, isActive: (path: string) => path.startsWith("/avisos") },
-  { label: "Mi cuenta", href: "/mi-cuenta", icon: UserIcon, isActive: (path: string) => path.startsWith("/mi-cuenta") },
+  { label: "Feed", href: "/", icon: HomeIcon, isActive: (path: string) => path === "/", adminOnly: false },
+  { label: "Niños", href: "/ninos", icon: UsersIcon, isActive: (path: string) => path.startsWith("/ninos"), adminOnly: false },
+  { label: "Avisos", href: "/avisos", icon: BellIcon, isActive: (path: string) => path.startsWith("/avisos"), adminOnly: false },
+  { label: "Equipo", href: "/equipo", icon: TeamIcon, isActive: (path: string) => path.startsWith("/equipo"), adminOnly: true },
+  { label: "Mi cuenta", href: "/mi-cuenta", icon: UserIcon, isActive: (path: string) => path.startsWith("/mi-cuenta"), adminOnly: false },
 ];
 
 export default function Sidebar({
   onNewPost,
   canPublish = true,
+  isAdmin = false,
 }: {
   onNewPost?: () => void;
   canPublish?: boolean;
+  isAdmin?: boolean;
 }) {
   const pathname = usePathname();
+  const items = navItems.filter((item) => !item.adminOnly || isAdmin);
 
   return (
     <>
       {/* Botón hamburguesa (móvil) */}
-      <MobileSidebarTrigger />
+      <MobileSidebarTrigger items={items} />
 
       {/* Sidebar desktop (siempre visible en lg+) */}
       <div className="hidden lg:block">
-        <DesktopSidebarContent pathname={pathname} onNewPost={onNewPost} canPublish={canPublish} />
+        <DesktopSidebarContent pathname={pathname} onNewPost={onNewPost} canPublish={canPublish} items={items} />
       </div>
     </>
   );
 }
 
-function MobileSidebarTrigger() {
+type NavItem = (typeof navItems)[number];
+
+function MobileSidebarTrigger({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -55,7 +62,7 @@ function MobileSidebarTrigger() {
 
       {open && (
         <div className="fixed inset-y-0 left-0 z-50 lg:hidden">
-          <MobileSidebarContent pathname={pathname} onClose={() => setOpen(false)} />
+          <MobileSidebarContent pathname={pathname} onClose={() => setOpen(false)} items={items} />
         </div>
       )}
     </>
@@ -66,10 +73,12 @@ function DesktopSidebarContent({
   pathname,
   onNewPost,
   canPublish,
+  items,
 }: {
   pathname: string;
   onNewPost?: () => void;
   canPublish: boolean;
+  items: NavItem[];
 }) {
   return (
     <aside className="sticky top-0 flex h-screen w-[248px] flex-none flex-col border-r border-line bg-surface px-4 py-6">
@@ -98,7 +107,7 @@ function DesktopSidebarContent({
 
       {/* Navegación */}
       <nav className="flex flex-1 flex-col gap-1">
-        {navItems.map(({ label, href, icon: Icon, isActive }) => {
+        {items.map(({ label, href, icon: Icon, isActive }) => {
           const active = isActive(pathname);
           return (
             <Link
@@ -140,7 +149,15 @@ function DesktopSidebarContent({
   );
 }
 
-function MobileSidebarContent({ pathname, onClose }: { pathname: string; onClose: () => void }) {
+function MobileSidebarContent({
+  pathname,
+  onClose,
+  items,
+}: {
+  pathname: string;
+  onClose: () => void;
+  items: NavItem[];
+}) {
   return (
     <aside className="relative flex h-screen w-[248px] flex-col border-r border-line bg-surface px-4 py-6">
       {/* Botón cerrar */}
@@ -165,7 +182,7 @@ function MobileSidebarContent({ pathname, onClose }: { pathname: string; onClose
 
       {/* Navegación */}
       <nav className="mt-[18px] flex flex-1 flex-col gap-1">
-        {navItems.map(({ label, href, icon: Icon, isActive }) => {
+        {items.map(({ label, href, icon: Icon, isActive }) => {
           const active = isActive(pathname);
           return (
             <Link

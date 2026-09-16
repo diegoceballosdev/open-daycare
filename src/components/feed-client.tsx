@@ -13,6 +13,7 @@ import { dayKey, formatDayLabel } from "@/lib/date-format";
 interface FeedClientProps {
   initialPosts: FeedPost[];
   canPublish: boolean;
+  isAdmin: boolean;
   currentUserId: string;
   kids: PostKid[];
   roomId: string | null;
@@ -26,6 +27,7 @@ const PAGE_SIZE = 10;
 export default function FeedClient({
   initialPosts,
   canPublish,
+  isAdmin,
   currentUserId,
   kids,
   roomId,
@@ -69,7 +71,7 @@ export default function FeedClient({
 
   return (
     <div className="flex min-h-screen bg-cream">
-      <Sidebar onNewPost={openNewPost} canPublish={canPublish} />
+      <Sidebar onNewPost={openNewPost} canPublish={canPublish} isAdmin={isAdmin} />
 
       <main className="h-screen min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[760px] px-10 pb-20 pt-[34px]">

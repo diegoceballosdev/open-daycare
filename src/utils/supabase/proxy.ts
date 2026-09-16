@@ -40,9 +40,11 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getClaims();
 
   const pathname = request.nextUrl.pathname;
-  // Rutas públicas: solo /ingresar y /activar. El resto requiere sesión.
+  // Rutas públicas: /ingresar, /activar y /definir-contrasena. El resto requiere sesión.
   const isPublicRoute =
-    pathname.startsWith("/ingresar") || pathname.startsWith("/activar");
+    pathname.startsWith("/ingresar") ||
+    pathname.startsWith("/activar") ||
+    pathname.startsWith("/definir-contrasena");
 
   // Ruta protegida sin sesión → redirigir al login.
   if (!isPublicRoute && !data) {

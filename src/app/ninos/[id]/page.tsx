@@ -9,6 +9,13 @@ export default async function ChildProfilePage(props: PageProps<"/ninos/[id]">) 
   const { id } = await props.params;
   const supabase = await createClient();
 
+  const { data: claims } = await supabase.auth.getClaims();
+  const { data: profile } = await supabase
+    .from("users")
+    .select("role")
+    .eq("id", claims?.claims?.sub ?? "")
+    .maybeSingle();
+
   const { data: child } = await supabase
     .from("children")
     .select("id, full_name, birth_date, enrolled_at, medical_notes, allergy_tags, room_id, rooms(id, name)")
@@ -24,7 +31,7 @@ export default async function ChildProfilePage(props: PageProps<"/ninos/[id]">) 
 
   return (
     <div className="flex min-h-screen bg-cream">
-      <Sidebar />
+      <Sidebar isAdmin={profile?.role === "admin"} />
       <main className="h-screen min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[820px] px-10 pb-20 pt-[34px]">
           {/* Volver a Niños */}
