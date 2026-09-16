@@ -1,37 +1,57 @@
-import type { Post, PostType } from "@/data/posts";
-import { HeartIcon, ImageIcon, MegaphoneIcon, MessageIcon } from "@/components/icons";
+import type { FeedPost } from "@/lib/post-types";
+import { typeLabel, typeTheme } from "@/lib/post-types";
+import { formatTime } from "@/lib/date-format";
+import { HeartIcon, MegaphoneIcon, MessageIcon } from "@/components/icons";
 
-// Tema del badge por tipo de publicación: clave en inglés (PostType), etiqueta visual en español
-const badgeTheme: Record<PostType, { label: string; background: string; dot: string; text: string }> = {
-  achievement: { label: "LOGRO", background: "var(--color-success-soft)", dot: "var(--color-success)", text: "var(--color-success)" },
-  activity: { label: "ACTIVIDAD", background: "var(--color-info-soft)", dot: "var(--color-info)", text: "var(--color-info)" },
-  announcement: { label: "ANUNCIO", background: "var(--color-announcement-soft)", dot: "var(--color-announcement)", text: "var(--color-announcement)" },
-};
+interface PostCardProps {
+  post: FeedPost;
+  // Id del usuario logueado: define el "publicado por vos" del subtítulo.
+  currentUserId: string;
+}
 
-export default function PostCard({ post }: { post: Post }) {
-  const theme = badgeTheme[post.type];
-  const { author } = post;
+// Iniciales del autor a partir de su nombre completo (máximo dos letras).
+function initials(fullName: string): string {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
+  return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+}
+
+// Tarjeta de una publicación del feed: réplica del mock references/pantallas/feed.dc.html.
+export default function PostCard({ post, currentUserId }: PostCardProps) {
+  const theme = typeTheme[post.type];
+  const isAnnouncement = post.isRoomAnnouncement;
+  const title = isAnnouncement ? "Anuncio general" : post.authorName;
+  const authorLabel = post.authorId === currentUserId ? "publicado por vos" : post.authorName;
 
   return (
     <article className="rounded-[20px] border border-line bg-surface px-[22px] py-5 shadow-[0_4px_16px_-12px_rgba(120,90,60,.5)]">
-      {/* Cabecera: avatar, autor y badge */}
+      {/* Cabecera: avatar, autor y badge de tipo */}
       <div className="mb-[14px] flex items-center gap-3">
-        <div
-          className="flex h-11 w-11 flex-none items-center justify-center rounded-full font-display text-[17px] font-semibold"
-          style={{ backgroundColor: author.avatarBackground, color: author.avatarForeground }}
-        >
-          {author.avatarIcon === "megaphone" ? <MegaphoneIcon /> : author.initials}
-        </div>
+        {isAnnouncement ? (
+          <div
+            className="flex h-11 w-11 flex-none items-center justify-center rounded-full"
+            style={{ backgroundColor: "#CCD8F4", color: "#4E72C8" }}
+          >
+            <MegaphoneIcon />
+          </div>
+        ) : (
+          <div className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-brand font-display text-[17px] font-semibold text-white">
+            {initials(post.authorName)}
+          </div>
+        )}
         <div className="min-w-0 flex-1">
-          <div className="font-display text-[16.5px] font-semibold leading-tight text-ink">{author.name}</div>
-          <div className="text-[12.5px] text-ink-faint">{post.time} · publicado por vos</div>
+          <div className="font-display text-[16.5px] font-semibold leading-tight text-ink">{title}</div>
+          <div className="text-[12.5px] text-ink-faint">
+            {formatTime(post.publishedAt)} · {authorLabel}
+          </div>
         </div>
         <div
           className="flex items-center gap-[7px] rounded-full px-3 py-1.5"
-          style={{ backgroundColor: theme.background, color: theme.text }}
+          style={{ backgroundColor: theme.softBackground, color: theme.softText }}
         >
-          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: theme.dot }} />
-          <span className="text-xs font-extrabold tracking-[.5px]">{theme.label}</span>
+          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: theme.softText }} />
+          <span className="text-xs font-extrabold uppercase tracking-[.5px]">{typeLabel[post.type]}</span>
         </div>
       </div>
 
@@ -39,18 +59,24 @@ export default function PostCard({ post }: { post: Post }) {
       <div className="mb-2.5 text-[12.5px] text-ink-faint">{post.audienceLabel}</div>
       <p className="m-0 text-[15.5px] leading-[1.55] text-ink-body">{post.body}</p>
 
-      {/* Placeholder de foto */}
-      {post.photo && (
-        <a
-          href="#"
-          className="mt-3.5 flex h-[200px] flex-col items-center justify-center gap-2 rounded-[16px] border-[1.5px] border-dashed border-photo-line bg-photo-bg text-photo-ink"
-        >
-          <ImageIcon />
-          <span className="text-[13.5px]">{post.photo.label}</span>
-        </a>
+      {/* Imágenes desde URLs firmadas del bucket privado */}
+      {post.photos.length > 0 && (
+        <div className="mt-3.5 flex flex-col gap-2.5">
+          {post.photos.map((photo) =>
+            photo.signedUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={photo.path}
+                src={photo.signedUrl}
+                alt=""
+                className="w-full rounded-[16px] border border-line object-cover"
+              />
+            ) : null
+          )}
+        </div>
       )}
 
-      {/* Reacciones y editar */}
+      {/* Reacciones (contadores en 0 en esta spec) y Editar inerte */}
       <div className="mt-4 flex items-center gap-[18px] border-t border-divider pt-3.5">
         <span className="flex items-center gap-[7px] text-sm font-bold text-accent-strong">
           <HeartIcon />

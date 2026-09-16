@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { currentUser } from "@/data/posts";
+import { currentUser } from "@/data/current-user";
 import { logout } from "@/app/auth/actions";
 import { BellIcon, HomeIcon, LogoutIcon, MenuIcon, PlusIcon, SunIcon, UserIcon, UsersIcon, XIcon } from "@/components/icons";
 
@@ -15,7 +15,13 @@ const navItems = [
   { label: "Mi cuenta", href: "/mi-cuenta", icon: UserIcon, isActive: (path: string) => path.startsWith("/mi-cuenta") },
 ];
 
-export default function Sidebar({ onNewPost }: { onNewPost?: () => void }) {
+export default function Sidebar({
+  onNewPost,
+  canPublish = true,
+}: {
+  onNewPost?: () => void;
+  canPublish?: boolean;
+}) {
   const pathname = usePathname();
 
   return (
@@ -25,7 +31,7 @@ export default function Sidebar({ onNewPost }: { onNewPost?: () => void }) {
 
       {/* Sidebar desktop (siempre visible en lg+) */}
       <div className="hidden lg:block">
-        <DesktopSidebarContent pathname={pathname} onNewPost={onNewPost} />
+        <DesktopSidebarContent pathname={pathname} onNewPost={onNewPost} canPublish={canPublish} />
       </div>
     </>
   );
@@ -56,7 +62,15 @@ function MobileSidebarTrigger() {
   );
 }
 
-function DesktopSidebarContent({ pathname, onNewPost }: { pathname: string; onNewPost?: () => void }) {
+function DesktopSidebarContent({
+  pathname,
+  onNewPost,
+  canPublish,
+}: {
+  pathname: string;
+  onNewPost?: () => void;
+  canPublish: boolean;
+}) {
   return (
     <aside className="sticky top-0 flex h-screen w-[248px] flex-none flex-col border-r border-line bg-surface px-4 py-6">
       {/* Marca */}
@@ -70,15 +84,17 @@ function DesktopSidebarContent({ pathname, onNewPost }: { pathname: string; onNe
         </div>
       </a>
 
-      {/* Botón nueva publicación */}
-      <button
-        type="button"
-        onClick={onNewPost}
-        className="mb-[18px] flex w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] px-4 py-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,.75)]"
-      >
-        <PlusIcon />
-        Nueva publicación
-      </button>
+      {/* Botón nueva publicación: oculto para roles que no publican */}
+      {canPublish && (
+        <button
+          type="button"
+          onClick={onNewPost}
+          className="mb-[18px] flex w-full items-center justify-center gap-2 rounded-[14px] bg-gradient-to-b from-[#F4977E] to-[#EE8164] px-4 py-3 text-[14.5px] font-extrabold text-white shadow-[0_8px_18px_-8px_rgba(238,129,100,.75)]"
+        >
+          <PlusIcon />
+          Nueva publicación
+        </button>
+      )}
 
       {/* Navegación */}
       <nav className="flex flex-1 flex-col gap-1">
