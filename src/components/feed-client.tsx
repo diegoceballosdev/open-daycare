@@ -5,7 +5,7 @@ import Sidebar from "@/components/sidebar";
 import Composer from "@/components/composer";
 import NewPostModal, { type PostKid } from "@/components/new-post-modal";
 import PostCard from "@/components/post-card";
-import { currentUser } from "@/data/current-user";
+import type { CurrentUserView } from "@/lib/current-user";
 import { loadMorePosts } from "@/app/feed/actions";
 import type { FeedPost } from "@/lib/post-types";
 import { dayKey, formatDayLabel } from "@/lib/date-format";
@@ -15,12 +15,19 @@ interface FeedClientProps {
   canPublish: boolean;
   isAdmin: boolean;
   currentUserId: string;
+  currentUser: CurrentUserView;
+  childCount: number;
+  todayLabel: string;
   kids: PostKid[];
   roomId: string | null;
-  roomName: string;
 }
 
 const PAGE_SIZE = 10;
+
+// Primer nombre para el saludo de la cabecera.
+function firstName(fullName: string): string {
+  return fullName.trim().split(/\s+/)[0] ?? fullName;
+}
 
 // Feed: estado del modal, lista de publicaciones y paginación por cursor.
 // Renderiza el sidebar, el composer y la lista (arquitectura elegida en el spec).
@@ -29,9 +36,11 @@ export default function FeedClient({
   canPublish,
   isAdmin,
   currentUserId,
+  currentUser,
+  childCount,
+  todayLabel,
   kids,
   roomId,
-  roomName,
 }: FeedClientProps) {
   const [newPostOpen, setNewPostOpen] = useState(false);
   // Páginas extra de "Ver más"; la primera viene del servidor.
@@ -71,22 +80,24 @@ export default function FeedClient({
 
   return (
     <div className="flex min-h-screen bg-cream">
-      <Sidebar onNewPost={openNewPost} canPublish={canPublish} isAdmin={isAdmin} />
+      <Sidebar currentUser={currentUser} onNewPost={openNewPost} canPublish={canPublish} isAdmin={isAdmin} />
 
       <main className="h-screen min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[760px] px-10 pb-20 pt-[34px]">
-          {/* Cabecera (identidad mock: fuera del alcance de esta spec) */}
+          {/* Cabecera: identidad real del usuario y conteo de niños del daycare */}
           <div className="mb-6">
             <div className="mb-1 text-[12.5px] font-extrabold tracking-[.8px] text-accent">
-              GUARDERÍA · {currentUser.classroom.toUpperCase()}
+              GUARDERÍA · {(currentUser.roomName ?? currentUser.daycareName).toUpperCase()}
             </div>
             <h1 className="m-0 font-display text-[30px] font-semibold text-ink">
-              Buenas, {currentUser.name.split(" ")[0]}
+              Buenas, {firstName(currentUser.fullName)}
             </h1>
-            <p className="mt-[5px] text-[14.5px] text-ink-muted">12 niños · martes 17 jun</p>
+            <p className="mt-[5px] text-[14.5px] text-ink-muted">
+              {childCount} niños · {todayLabel}
+            </p>
           </div>
 
-          <Composer onOpen={openNewPost} canPublish={canPublish} />
+          <Composer initials={currentUser.initials} onOpen={openNewPost} canPublish={canPublish} />
 
           {posts.length === 0 ? (
             <EmptyState canPublish={canPublish} onOpen={openNewPost} />
@@ -125,7 +136,7 @@ export default function FeedClient({
         onClose={closeNewPost}
         kids={kids}
         roomId={roomId}
-        roomName={roomName}
+        roomName={currentUser.roomName ?? ""}
         canPublishWholeRoom={roomId !== null}
       />
     </div>

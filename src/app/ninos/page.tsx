@@ -1,15 +1,13 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 import NinosPageClient from "@/components/ninos-page-client";
 
 export default async function ChildrenPage() {
-  const supabase = await createClient();
+  const currentUser = await getCurrentUser();
+  if (!currentUser) redirect("/ingresar");
 
-  const { data: claims } = await supabase.auth.getClaims();
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", claims?.claims?.sub ?? "")
-    .maybeSingle();
+  const supabase = await createClient();
 
   const [{ data: children }, { data: rooms }, { data: parentLinks }] = await Promise.all([
     supabase
@@ -33,7 +31,8 @@ export default async function ChildrenPage() {
       kids={children ?? []}
       rooms={rooms ?? []}
       parentCounts={parentCounts}
-      isAdmin={profile?.role === "admin"}
+      isAdmin={currentUser.role === "admin"}
+      currentUser={currentUser}
     />
   );
 }

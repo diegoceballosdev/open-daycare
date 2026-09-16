@@ -5,6 +5,7 @@ import Sidebar from "@/components/sidebar";
 import ChildCard, { type ChildWithRoom } from "@/components/child-card";
 import ChildSearch from "@/components/child-search";
 import AddChildModal from "@/components/add-child-modal";
+import type { CurrentUserView } from "@/lib/current-user";
 import { PlusIcon } from "@/components/icons";
 
 interface NinosPageClientProps {
@@ -12,11 +13,18 @@ interface NinosPageClientProps {
   rooms: { id: string; name: string }[];
   parentCounts: Record<string, number>;
   isAdmin: boolean;
+  currentUser: CurrentUserView;
 }
 
 // Wrapper cliente de /ninos: dueño del estado del modal, el botón "Agregar niño" y la lista.
 // Recibe los niños y salas resueltos por el Server Component desde la BD.
-export default function NinosPageClient({ kids, rooms, parentCounts, isAdmin }: NinosPageClientProps) {
+export default function NinosPageClient({
+  kids,
+  rooms,
+  parentCounts,
+  isAdmin,
+  currentUser,
+}: NinosPageClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -31,7 +39,7 @@ export default function NinosPageClient({ kids, rooms, parentCounts, isAdmin }: 
 
   return (
     <div className="flex min-h-screen bg-cream">
-      <Sidebar isAdmin={isAdmin} />
+      <Sidebar currentUser={currentUser} isAdmin={isAdmin} />
       <main className="h-screen min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[880px] px-10 pb-20 pt-[34px]">
           {/* Cabecera */}

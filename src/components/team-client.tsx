@@ -5,6 +5,7 @@ import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { createStaff, type CreateStaffState } from "@/app/equipo/actions";
 import Sidebar from "@/components/sidebar";
+import type { CurrentUserView } from "@/lib/current-user";
 import type { Database } from "@/lib/database.types";
 
 type UserRole = Database["public"]["Enums"]["user_role"];
@@ -23,6 +24,7 @@ interface TeamClientProps {
   members: TeamMember[];
   rooms: { id: string; name: string }[];
   isAdmin: boolean;
+  currentUser: CurrentUserView;
 }
 
 interface FieldErrors {
@@ -58,7 +60,7 @@ function initials(fullName: string): string {
 // /equipo: lista del equipo del daycare y formulario de alta de staff (SPEC 15).
 // El Server Component ya filtró por daycare y rol; acá solo se valida en cliente y se
 // despacha la Server Action createStaff.
-export default function TeamClient({ members, rooms, isAdmin }: TeamClientProps) {
+export default function TeamClient({ members, rooms, isAdmin, currentUser }: TeamClientProps) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(createStaff, initialState);
   const formRef = useRef<HTMLFormElement>(null);
@@ -96,7 +98,7 @@ export default function TeamClient({ members, rooms, isAdmin }: TeamClientProps)
 
   return (
     <div className="flex min-h-screen bg-cream">
-      <Sidebar isAdmin={isAdmin} />
+      <Sidebar currentUser={currentUser} isAdmin={isAdmin} />
       <main className="h-screen min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[880px] px-10 pb-20 pt-[34px]">
           {/* Cabecera */}

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 import Sidebar from "@/components/sidebar";
 import ChildProfile from "@/components/child-profile";
 import { BackIcon } from "@/components/icons";
@@ -7,14 +8,11 @@ import Link from "next/link";
 
 export default async function ChildProfilePage(props: PageProps<"/ninos/[id]">) {
   const { id } = await props.params;
-  const supabase = await createClient();
 
-  const { data: claims } = await supabase.auth.getClaims();
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role")
-    .eq("id", claims?.claims?.sub ?? "")
-    .maybeSingle();
+  const currentUser = await getCurrentUser();
+  if (!currentUser) redirect("/ingresar");
+
+  const supabase = await createClient();
 
   const { data: child } = await supabase
     .from("children")
@@ -31,7 +29,7 @@ export default async function ChildProfilePage(props: PageProps<"/ninos/[id]">) 
 
   return (
     <div className="flex min-h-screen bg-cream">
-      <Sidebar isAdmin={profile?.role === "admin"} />
+      <Sidebar currentUser={currentUser} isAdmin={currentUser.role === "admin"} />
       <main className="h-screen min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[820px] px-10 pb-20 pt-[34px]">
           {/* Volver a Niños */}

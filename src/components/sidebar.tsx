@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { currentUser } from "@/data/current-user";
+import type { CurrentUserView } from "@/lib/current-user";
 import { logout } from "@/app/auth/actions";
 import { BellIcon, HomeIcon, LogoutIcon, MenuIcon, PlusIcon, SunIcon, TeamIcon, UserIcon, UsersIcon, XIcon } from "@/components/icons";
 
@@ -18,10 +18,12 @@ const navItems = [
 ];
 
 export default function Sidebar({
+  currentUser,
   onNewPost,
   canPublish = true,
   isAdmin = false,
 }: {
+  currentUser: CurrentUserView;
   onNewPost?: () => void;
   canPublish?: boolean;
   isAdmin?: boolean;
@@ -32,11 +34,17 @@ export default function Sidebar({
   return (
     <>
       {/* Botón hamburguesa (móvil) */}
-      <MobileSidebarTrigger items={items} />
+      <MobileSidebarTrigger items={items} currentUser={currentUser} />
 
       {/* Sidebar desktop (siempre visible en lg+) */}
       <div className="hidden lg:block">
-        <DesktopSidebarContent pathname={pathname} onNewPost={onNewPost} canPublish={canPublish} items={items} />
+        <DesktopSidebarContent
+          pathname={pathname}
+          currentUser={currentUser}
+          onNewPost={onNewPost}
+          canPublish={canPublish}
+          items={items}
+        />
       </div>
     </>
   );
@@ -44,7 +52,32 @@ export default function Sidebar({
 
 type NavItem = (typeof navItems)[number];
 
-function MobileSidebarTrigger({ items }: { items: NavItem[] }) {
+// Avatar del usuario: foto si existe, iniciales sobre el color de marca si no.
+function UserAvatar({ user }: { user: CurrentUserView }) {
+  if (user.avatarUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={user.avatarUrl}
+        alt=""
+        className="h-[38px] w-[38px] flex-none rounded-full object-cover"
+      />
+    );
+  }
+  return (
+    <div className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-full bg-brand font-display text-base font-semibold text-white">
+      {user.initials}
+    </div>
+  );
+}
+
+function MobileSidebarTrigger({
+  items,
+  currentUser,
+}: {
+  items: NavItem[];
+  currentUser: CurrentUserView;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -62,7 +95,12 @@ function MobileSidebarTrigger({ items }: { items: NavItem[] }) {
 
       {open && (
         <div className="fixed inset-y-0 left-0 z-50 lg:hidden">
-          <MobileSidebarContent pathname={pathname} onClose={() => setOpen(false)} items={items} />
+          <MobileSidebarContent
+            pathname={pathname}
+            currentUser={currentUser}
+            onClose={() => setOpen(false)}
+            items={items}
+          />
         </div>
       )}
     </>
@@ -71,11 +109,13 @@ function MobileSidebarTrigger({ items }: { items: NavItem[] }) {
 
 function DesktopSidebarContent({
   pathname,
+  currentUser,
   onNewPost,
   canPublish,
   items,
 }: {
   pathname: string;
+  currentUser: CurrentUserView;
   onNewPost?: () => void;
   canPublish: boolean;
   items: NavItem[];
@@ -89,7 +129,9 @@ function DesktopSidebarContent({
         </div>
         <div>
           <div className="font-display text-[17px] font-semibold leading-none text-ink">OpenDayCare</div>
-          <div className="mt-0.5 text-[11.5px] text-ink-faint">{currentUser.classroom}</div>
+          <div className="mt-0.5 text-[11.5px] text-ink-faint">
+            {currentUser.roomName ?? currentUser.daycareName}
+          </div>
         </div>
       </a>
 
@@ -127,12 +169,10 @@ function DesktopSidebarContent({
       {/* Bloque de usuario */}
       <div className="mt-[10px] border-t border-line pt-[14px]">
         <div className="flex items-center gap-[11px] px-2 py-1.5">
-          <div className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-full bg-brand font-display text-base font-semibold text-white">
-            {currentUser.initials}
-          </div>
+          <UserAvatar user={currentUser} />
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-extrabold text-ink">{currentUser.name}</div>
-            <div className="text-xs text-ink-faint">{currentUser.role}</div>
+            <div className="text-sm font-extrabold text-ink">{currentUser.fullName}</div>
+            <div className="text-xs text-ink-faint">{currentUser.roleLabel}</div>
           </div>
           <form action={logout}>
             <button
@@ -151,10 +191,12 @@ function DesktopSidebarContent({
 
 function MobileSidebarContent({
   pathname,
+  currentUser,
   onClose,
   items,
 }: {
   pathname: string;
+  currentUser: CurrentUserView;
   onClose: () => void;
   items: NavItem[];
 }) {
@@ -176,7 +218,9 @@ function MobileSidebarContent({
         </div>
         <div>
           <div className="font-display text-[17px] font-semibold leading-none text-ink">OpenDayCare</div>
-          <div className="mt-0.5 text-[11.5px] text-ink-faint">{currentUser.classroom}</div>
+          <div className="mt-0.5 text-[11.5px] text-ink-faint">
+            {currentUser.roomName ?? currentUser.daycareName}
+          </div>
         </div>
       </a>
 
@@ -203,12 +247,10 @@ function MobileSidebarContent({
       {/* Bloque de usuario */}
       <div className="mt-[10px] border-t border-line pt-[14px]">
         <div className="flex items-center gap-[11px] px-2 py-1.5">
-          <div className="flex h-[38px] w-[38px] flex-none items-center justify-center rounded-full bg-brand font-display text-base font-semibold text-white">
-            {currentUser.initials}
-          </div>
+          <UserAvatar user={currentUser} />
           <div className="min-w-0 flex-1">
-            <div className="text-sm font-extrabold text-ink">{currentUser.name}</div>
-            <div className="text-xs text-ink-faint">{currentUser.role}</div>
+            <div className="text-sm font-extrabold text-ink">{currentUser.fullName}</div>
+            <div className="text-xs text-ink-faint">{currentUser.roleLabel}</div>
           </div>
           <form action={logout}>
             <button
