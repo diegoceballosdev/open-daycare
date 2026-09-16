@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import TeamClient from "@/components/team-client";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { createClient } from "@/utils/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 
 // Tope de páginas de `listUsers` (1000 usuarios por página).
 const MAX_USER_PAGES = 10;
@@ -42,34 +43,25 @@ function roomName(rooms: { name: string } | { name: string }[] | null): string {
 
 // /equipo: solo el admin de la guardería ve y administra a su equipo.
 export default async function TeamPage() {
+  const currentUser = await getCurrentUser();
+  if (!currentUser) redirect("/ingresar");
+  if (currentUser.role !== "admin") redirect("/");
+
   const supabase = await createClient();
-
-  const { data: claims } = await supabase.auth.getClaims();
-  const currentUserId = claims?.claims?.sub;
-  if (!currentUserId) redirect("/ingresar");
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("role, daycare_id")
-    .eq("id", currentUserId)
-    .maybeSingle();
-
-  if (!profile || profile.role !== "admin" || !profile.daycare_id) {
-    redirect("/");
-  }
+  const daycareId = currentUser.daycareId;
 
   // La policy del daycare devuelve todos los usuarios (incluye padres): se filtra por rol.
   const [{ data: members }, { data: rooms }] = await Promise.all([
     supabase
       .from("users")
       .select("id, full_name, role, status, rooms(name)")
-      .eq("daycare_id", profile.daycare_id)
+      .eq("daycare_id", daycareId)
       .in("role", ["staff", "admin"])
       .order("full_name"),
     supabase
       .from("rooms")
       .select("id, name")
-      .eq("daycare_id", profile.daycare_id)
+      .eq("daycare_id", daycareId)
       .order("name"),
   ]);
 
@@ -84,5 +76,12 @@ export default async function TeamPage() {
     roomName: roomName(member.rooms),
   }));
 
-  return <TeamClient members={team} rooms={rooms ?? []} isAdmin={profile.role === "admin"} />;
+  return (
+    <TeamClient
+      members={team}
+      rooms={rooms ?? []}
+      isAdmin={currentUser.role === "admin"}
+      currentUser={currentUser}
+    />
+  );
 }

@@ -1,5 +1,8 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { getCurrentUser } from "@/lib/current-user";
 import { loadMorePosts } from "@/app/feed/actions";
+import { formatLongDate } from "@/lib/date-format";
 import FeedClient from "@/components/feed-client";
 import type { PostKid } from "@/components/new-post-modal";
 
@@ -16,36 +19,24 @@ function firstName(fullName: string): string {
   return fullName.trim().split(/\s+/)[0] ?? fullName;
 }
 
-// Home: lee el perfil (users_select_self), arma los datos del staff y delega la UI.
+// Home: resuelve la identidad real, cuenta los niños del daycare y delega la UI.
 export default async function Home() {
+  const currentUser = await getCurrentUser();
+  if (!currentUser) redirect("/ingresar");
+
   const supabase = await createClient();
+  const canPublish = currentUser.role === "staff";
+  const isAdmin = currentUser.role === "admin";
+  const roomId = currentUser.roomId;
 
-  const { data: claims } = await supabase.auth.getClaims();
-  const currentUserId = claims?.claims?.sub ?? "";
-
-  const { data: profile } = await supabase
-    .from("users")
-    .select("id, full_name, role, room_id, daycare_id")
-    .eq("id", currentUserId)
-    .maybeSingle();
-
-  const role = profile?.role ?? "parent";
-  const canPublish = role === "staff";
-  const isAdmin = role === "admin";
-  const roomId = profile?.room_id ?? null;
-
-  // Solo el staff publica: necesita los niños de su sala y el nombre de la sala.
+  // Solo el staff publica: necesita los niños de su sala.
   let kids: PostKid[] = [];
-  let roomName = "";
   if (canPublish && roomId) {
-    const [{ data: children }, { data: room }] = await Promise.all([
-      supabase
-        .from("children")
-        .select("id, full_name")
-        .eq("room_id", roomId)
-        .order("full_name"),
-      supabase.from("rooms").select("name").eq("id", roomId).maybeSingle(),
-    ]);
+    const { data: children } = await supabase
+      .from("children")
+      .select("id, full_name")
+      .eq("room_id", roomId)
+      .order("full_name");
 
     kids = (children ?? []).map((child, index) => {
       const palette = KID_AVATAR_PALETTE[index % KID_AVATAR_PALETTE.length];
@@ -58,8 +49,13 @@ export default async function Home() {
         avatarForeground: palette.foreground,
       };
     });
-    roomName = room?.name ?? "";
   }
+
+  // `children` no tiene daycare_id: el conteo se acota por las salas del daycare.
+  const { count } = await supabase
+    .from("children")
+    .select("id, rooms!inner(daycare_id)", { count: "exact", head: true })
+    .eq("rooms.daycare_id", currentUser.daycareId);
 
   // El feed lo filtra RLS por rol y daycare; la primera página se resuelve en servidor.
   const posts = await loadMorePosts(null);
@@ -69,10 +65,12 @@ export default async function Home() {
       initialPosts={posts}
       canPublish={canPublish}
       isAdmin={isAdmin}
-      currentUserId={currentUserId}
+      currentUserId={currentUser.id}
+      currentUser={currentUser}
+      childCount={count ?? 0}
+      todayLabel={formatLongDate(new Date().toISOString())}
       kids={kids}
       roomId={roomId}
-      roomName={roomName}
     />
   );
 }
