@@ -31,6 +31,7 @@ export default async function Home() {
 
   const role = profile?.role ?? "parent";
   const canPublish = role === "staff";
+  const isAdmin = role === "admin";
   const roomId = profile?.room_id ?? null;
 
   // Solo el staff publica: necesita los niños de su sala y el nombre de la sala.
@@ -67,6 +68,7 @@ export default async function Home() {
     <FeedClient
       initialPosts={posts}
       canPublish={canPublish}
+      isAdmin={isAdmin}
       currentUserId={currentUserId}
       kids={kids}
       roomId={roomId}

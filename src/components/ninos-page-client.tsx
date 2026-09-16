@@ -11,11 +11,12 @@ interface NinosPageClientProps {
   kids: ChildWithRoom[];
   rooms: { id: string; name: string }[];
   parentCounts: Record<string, number>;
+  isAdmin: boolean;
 }
 
 // Wrapper cliente de /ninos: dueño del estado del modal, el botón "Agregar niño" y la lista.
 // Recibe los niños y salas resueltos por el Server Component desde la BD.
-export default function NinosPageClient({ kids, rooms, parentCounts }: NinosPageClientProps) {
+export default function NinosPageClient({ kids, rooms, parentCounts, isAdmin }: NinosPageClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -30,7 +31,7 @@ export default function NinosPageClient({ kids, rooms, parentCounts }: NinosPage
 
   return (
     <div className="flex min-h-screen bg-cream">
-      <Sidebar />
+      <Sidebar isAdmin={isAdmin} />
       <main className="h-screen min-w-0 flex-1 overflow-y-auto">
         <div className="mx-auto w-full max-w-[880px] px-10 pb-20 pt-[34px]">
           {/* Cabecera */}
